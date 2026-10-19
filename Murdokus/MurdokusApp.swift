@@ -9,9 +9,14 @@ import SwiftUI
 
 @main
 struct MurdokusApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
+	@State private var engine = GridEngine(rows: 5, columns: 5, numOfSuspects: 3)
+	
+	var body: some Scene {
+		WindowGroup {
+			ContentView()
+				.environment(engine)
+				.frame(minWidth: 800, minHeight: 600)
+		}
+		.windowStyle(.hiddenTitleBar)
+	}
 }
