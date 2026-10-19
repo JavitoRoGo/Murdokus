@@ -3,7 +3,7 @@ import SwiftUI
 /// Representa los tipos de objetos que pueden existir en el tablero.
 enum MurdokuElement: String, CaseIterable, Identifiable {
     case suspect = "Sospechoso"
-	case xMark = "X"
+	case xMark = "Casilla bloqueada"
     case chair = "Silla"
     case table = "Mesa"
     case rug = "Alfombra"

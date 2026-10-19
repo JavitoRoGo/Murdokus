@@ -9,8 +9,8 @@ import SwiftUI
 
 @Observable
 final class GridEngine {
-    var rows: Int
-    var columns: Int
+    var rows: Int = 0
+    var columns: Int = 0
     var cells: [[Cell]] = []
 	var suspects: [MurdokuObject] = []
 	
@@ -23,16 +23,15 @@ final class GridEngine {
 		}
 	}()
 
-	init(rows: Int, columns: Int, numOfSuspects: Int) {
-        self.rows = rows
-        self.columns = columns
-        self.generateGrid()
-		self.generateSuspects(num: numOfSuspects)
-    }
+	func setupGameWith(rows: Int, columns: Int, suspectsNumber: Int) {
+		self.rows = rows
+		self.columns = columns
+		generateGrid()
+		generateSuspects(num: suspectsNumber)
+	}
 
-    /// Genera una nueva cuadrícula con las dimensiones especificadas.
-    /// Por defecto, todas las celdas pertenecen a la habitación 0.
     private func generateGrid() {
+		guard rows > 0 && columns > 0 else { return }
         var newCells: [[Cell]] = []
 
         for _ in 0..<rows {
@@ -47,7 +46,7 @@ final class GridEngine {
 	
 	private func generateSuspects(num: Int) {
 		let names = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
-		guard num > 0, num <= names.count else { return }
+		guard num > 0 && num <= names.count else { return }
 		var suspectsList: [MurdokuObject] = []
 		
 		for i in 0 ..< num {
@@ -57,15 +56,20 @@ final class GridEngine {
 		self.suspects = suspectsList
 	}
 
-    /// Actualiza el elemento en una posición específica.
     func setElement(_ element: MurdokuObject?, atRow row: Int, col: Int) {
-        guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
+        guard row >= 0 && row <= rows && col >= 0 && col <= columns else { return }
         cells[row][col].element = element
     }
 
-    /// Actualiza el roomID de una celda (útil para pintar las habitaciones).
-	func setRoomID(_ newColor: Color, atRow row: Int, col: Int) {
-        guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
+	func setRoomColor(_ newColor: Color, atRow row: Int, col: Int) {
+        guard row >= 0 && row <= rows && col >= 0 && col <= columns else { return }
         cells[row][col].color = newColor
     }
+	
+	func resetGame() {
+		self.rows = 0
+		self.columns = 0
+		self.suspects = []
+		self.cells = []
+	}
 }

@@ -15,7 +15,7 @@ struct SingleElementView: View {
 			Text(object.name)
 			Spacer()
 			Image(systemName: object.element.icon(for: object.capitalLetter ?? ""))
-				.font(object.element == .suspect ? .largeTitle : .title)
+				.font(object.element == .suspect ? .largeTitle : .title2)
 				.padding(10)
 				.background {
 					Circle()

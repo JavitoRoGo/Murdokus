@@ -28,9 +28,13 @@ struct ElementsView: View {
 			Divider()
 			
 			Section {
-				LazyVGrid(columns: columns) {
-					ForEach(engine.suspects) { object in
-						SingleElementView(object: object)
+				if engine.suspects.isEmpty {
+					ContentUnavailableView("Elige el número de sospechosos", systemImage: "person.circle.fill")
+				} else {
+					LazyVGrid(columns: columns) {
+						ForEach(engine.suspects) { object in
+							SingleElementView(object: object)
+						}
 					}
 				}
 			} header: {
@@ -41,10 +45,11 @@ struct ElementsView: View {
 		}
 		.frame(minWidth: 300)
 		.padding()
+		.background(Color(NSColor.windowBackgroundColor))
     }
 }
 
 #Preview {
     ElementsView()
-		.environment(GridEngine(rows: 5, columns: 5, numOfSuspects: 3))
+		.environment(GridEngine())
 }
