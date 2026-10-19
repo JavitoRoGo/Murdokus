@@ -8,17 +8,21 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
-    }
+	@Environment(GridEngine.self) private var engine
+	
+	var body: some View {
+		NavigationSplitView {
+			SidebarView()
+		} content: {
+			ElementsView()
+		} detail: {
+			GridView()
+		}
+
+	}
 }
 
 #Preview {
-    ContentView()
+	ContentView()
+		.environment(GridEngine(rows: 5, columns: 5, numOfSuspects: 2))
 }
