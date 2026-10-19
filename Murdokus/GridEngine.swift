@@ -57,12 +57,12 @@ final class GridEngine {
 	}
 
     func setElement(_ element: MurdokuObject?, atRow row: Int, col: Int) {
-        guard row >= 0 && row <= rows && col >= 0 && col <= columns else { return }
+        guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
         cells[row][col].element = element
     }
 
 	func setRoomColor(_ newColor: Color, atRow row: Int, col: Int) {
-        guard row >= 0 && row <= rows && col >= 0 && col <= columns else { return }
+        guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
         cells[row][col].color = newColor
     }
 	
