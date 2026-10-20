@@ -1,7 +1,8 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// Representa los tipos de objetos que pueden existir en el tablero.
-enum MurdokuElement: String, CaseIterable, Identifiable {
+enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
     case suspect = "Sospechoso"
 	case xMark = "Casilla bloqueada"
     case chair = "Silla"
@@ -36,14 +37,14 @@ enum MurdokuElement: String, CaseIterable, Identifiable {
         default:
             return false
         }
-    }
+	}
 	
 	static var elements: [MurdokuElement] {
 		self.allCases.filter { $0 != .suspect }
 	}
 }
 
-struct MurdokuObject: Identifiable {
+struct MurdokuObject: Identifiable, Codable {
 	var id: String { name }
 	var name: String
 	var element: MurdokuElement
@@ -53,8 +54,9 @@ struct MurdokuObject: Identifiable {
 /// Representa una única posición en la cuadrícula.
 struct Cell {
     var element: MurdokuObject?
-    /// El identificador de la habitación (determina el color de fondo).
     var color: Color
 }
 
-
+extension UTType {
+	static let murdokuObject = UTType("com.murdoku.object")!
+}

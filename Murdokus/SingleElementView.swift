@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct SingleElementView: View {
 	let object: MurdokuObject
@@ -28,9 +29,12 @@ struct SingleElementView: View {
 			Capsule()
 				.fill(.ultraThinMaterial)
 		}
+        .onDrag {
+			NSItemProvider(object: MurdokuObjectProvider(object: object))
+        }
     }
 }
 
 #Preview {
-	SingleElementView(object: MurdokuObject(name: "char", element: .chair))
+    SingleElementView(object: MurdokuObject(name: "char", element: .chair))
 }
