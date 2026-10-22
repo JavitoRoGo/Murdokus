@@ -106,4 +106,43 @@ struct GridEngineTests {
 		#expect(!elementsWithoutSuspect.contains(.suspect))
 		#expect(elementsWithoutSuspect.count == MurdokuElement.allCases.count - 1)
 	}
+	
+	@Test("Limpiar una celda debe dejarla vacía")
+	func testClearCell() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0)
+		let object = MurdokuObject(name: "Mesa", element: .table)
+		
+		// Colocar y luego limpiar
+		engine.setElement(object, atRow: 1, col: 1)
+		#expect(engine.cells[1][1].element != nil)
+		
+		engine.clearCell(atRow: 1, col: 1)
+		#expect(engine.cells[1][1].element == nil)
+	}
+
+	@Test("Limpiar fuera de límites debe ser seguro")
+	func testClearCellOutOfBounds() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0)
+		
+		// Probar índices negativos y excedentes
+		engine.clearCell(atRow: -1, col: 0)
+		engine.clearCell(atRow: 3, col: 3)
+		
+		// Si llegamos aquí sin crash, el test pasa
+		#expect(true)
+	}
+
+	@Test("Colocar un objeto no debe afectar a las celdas adyacentes")
+	func testPlacementSideEffects() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0)
+		let object = MurdokuObject(name: "Planta", element: .plant)
+		
+		engine.setElement(object, atRow: 1, col: 1)
+		
+		// Verificar que las celdas vecinas siguen vacías
+		#expect(engine.cells[0][1].element == nil)
+		#expect(engine.cells[1][0].element == nil)
+		#expect(engine.cells[1][2].element == nil)
+		#expect(engine.cells[2][1].element == nil)
+	}
 }
