@@ -57,8 +57,18 @@ struct CellDropDelegate: DropDelegate {
 			Task { @MainActor in
 				let decoder = JSONDecoder()
 				if let package = try? decoder.decode(MurdokuTransferPackage.self, from: data) {
-					engine.setElement(package.object, atRow: row, col: col)
-					engine.clearCell(atRow: package.sourceRow, col: package.sourceCol)
+					let targetRow = row
+					let targetCol = col
+					let originRow = package.sourceRow
+					let originCol = package.sourceCol
+					
+					// Solo intentamos borrar si el origen es una celda real Y es diferente al destino
+					if originRow >= 0 && originRow != targetRow || originCol >= 0 && originCol != targetCol {
+						engine.clearCell(atRow: originRow, col: originCol)
+					}
+					
+					// Siempre colocamos el objeto en el destino
+					engine.setElement(package.object, atRow: targetRow, col: targetCol)
 				} else if let object = try? decoder.decode(MurdokuObject.self, from: data) {
 					// Fallback por si acaso el panel lateral enviara solo el objeto (aunque no debería)
 					engine.setElement(object, atRow: row, col: col)

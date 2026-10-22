@@ -30,7 +30,7 @@ struct SingleElementView: View {
 				.fill(.ultraThinMaterial)
 		}
         .onDrag {
-			NSItemProvider(object: MurdokuObjectProvider(object: object, row: 0, col: 0))
+			NSItemProvider(object: MurdokuObjectProvider(object: object, row: -1, col: -1))
 		} preview: {
 			Image(systemName: object.element.icon(for: object.capitalLetter ?? ""))
 				.resizable()
