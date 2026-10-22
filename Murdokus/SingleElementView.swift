@@ -30,8 +30,15 @@ struct SingleElementView: View {
 				.fill(.ultraThinMaterial)
 		}
         .onDrag {
-			NSItemProvider(object: MurdokuObjectProvider(object: object))
-        }
+			NSItemProvider(object: MurdokuObjectProvider(object: object, row: 0, col: 0))
+		} preview: {
+			Image(systemName: object.element.icon(for: object.capitalLetter ?? ""))
+				.resizable()
+				.frame(width: 75, height: 75)
+				.foregroundColor(.black.opacity(0.5))
+				.padding(10)
+				.background(Circle().fill(.ultraThinMaterial))
+		}
     }
 }
 

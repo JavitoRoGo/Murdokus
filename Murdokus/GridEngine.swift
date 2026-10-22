@@ -60,6 +60,11 @@ final class GridEngine {
         guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
         cells[row][col].element = element
     }
+	
+	func clearCell(atRow row: Int, col: Int) {
+		guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
+		self.cells[row][col].element = nil
+	}
 
 	func setRoomColor(_ newColor: Color, atRow row: Int, col: Int) {
         guard row >= 0 && row < rows && col >= 0 && col < columns else { return }

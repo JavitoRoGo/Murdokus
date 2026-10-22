@@ -51,6 +51,13 @@ struct MurdokuObject: Identifiable, Codable {
 	var capitalLetter: String? = nil
 }
 
+/// Estructura de transporte que encapsula el objeto y su origen para el Drag & Drop
+struct MurdokuTransferPackage: Codable {
+	let object: MurdokuObject
+	let sourceRow: Int
+	let sourceCol: Int
+}
+
 /// Representa una única posición en la cuadrícula.
 struct Cell {
     var element: MurdokuObject?

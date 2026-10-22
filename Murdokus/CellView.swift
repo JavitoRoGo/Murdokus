@@ -21,12 +21,20 @@ struct CellView: View {
 				.border(Color.black.opacity(0.1), width: 0.5)
 
 			if let object = cell.element {
-				Text(object.element.rawValue.prefix(1).uppercased())
-					.font(.caption2.bold())
-					.foregroundColor(.white)
-					.padding(4)
-					.background(Color.black.opacity(0.5))
-					.clipShape(Circle())
+				Image(systemName: object.element.icon(for: object.capitalLetter ?? ""))
+					.resizable()
+					.frame(width: 75, height: 75)
+					.foregroundColor(.black.opacity(0.5))
+					.onDrag {
+						NSItemProvider(object: MurdokuObjectProvider(object: object, row: row, col: col))
+					} preview: {
+						Image(systemName: object.element.icon(for: object.capitalLetter ?? ""))
+							.resizable()
+							.frame(width: 75, height: 75)
+							.foregroundColor(.black.opacity(0.5))
+							.padding(10)
+							.background(Circle().fill(.ultraThinMaterial))
+					}
 			}
 		}
 		.onDrop(of: [UTType.murdokuObject], delegate: CellDropDelegate(row: row, col: col, engine: engine))
@@ -48,8 +56,14 @@ struct CellDropDelegate: DropDelegate {
 			
 			Task { @MainActor in
 				let decoder = JSONDecoder()
-				if let object = try? decoder.decode(MurdokuObject.self, from: data) {
+				if let package = try? decoder.decode(MurdokuTransferPackage.self, from: data) {
+					engine.setElement(package.object, atRow: row, col: col)
+					engine.clearCell(atRow: package.sourceRow, col: package.sourceCol)
+				} else if let object = try? decoder.decode(MurdokuObject.self, from: data) {
+					// Fallback por si acaso el panel lateral enviara solo el objeto (aunque no debería)
 					engine.setElement(object, atRow: row, col: col)
+				} else {
+					print("DEBUG ERROR: Fallo total de decodificación en CellView")
 				}
 			}
 		}

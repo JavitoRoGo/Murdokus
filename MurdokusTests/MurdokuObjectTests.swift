@@ -39,4 +39,20 @@ struct MurdokuObjectTests {
 		let expectedIdentifier = "com.murdoku.object"
 		#expect(UTType.murdokuObject.identifier == expectedIdentifier)
 	}
+	
+	@Test("El paquete de transferencia debe codificarse y decodificarse correctamente")
+	func testTransferPackage() async throws {
+		let object = MurdokuObject(name: "Test", element: .chair)
+		let package = MurdokuTransferPackage(object: object, sourceRow: 1, sourceCol: 2)
+		
+		let encoder = JSONEncoder()
+		let decoder = JSONDecoder()
+		
+		let data = try encoder.encode(package)
+		let decodedPackage = try decoder.decode(MurdokuTransferPackage.self, from: data)
+		
+		await #expect(decodedPackage.object.name == "Test")
+		#expect(decodedPackage.sourceRow == 1)
+		#expect(decodedPackage.sourceCol == 2)
+	}
 }

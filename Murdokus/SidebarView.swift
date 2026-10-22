@@ -9,16 +9,16 @@ struct SidebarView: View {
     var body: some View {
         List {
             Section("Tablero") {
-				Stepper(value: $rows) {
+				Stepper(value: $rows, in: 0...20) {
 					Text("Filas: \(rows)")
 				}
-				Stepper(value: $columns) {
+				Stepper(value: $columns, in: 0...20) {
 					Text("Columnas: \(columns)")
 				}
             }
 			
 			Section("Sospechosos") {
-				Stepper(value: $suspects) {
+				Stepper(value: $suspects, in: 0...26) {
 					Text("Sospechosos: \(suspects)")
 				}
             }
