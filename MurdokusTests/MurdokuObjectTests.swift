@@ -10,7 +10,7 @@ import Foundation
 import UniformTypeIdentifiers
 @testable import Murdokus
 
-@Suite("Pruebas de Serialización de Objetos")
+@Suite("Pruebas de Serialización y Lógica de Negocio")
 struct MurdokuObjectTests {
 
     @Test("Un objeto debe poder codificarse y decodificarse sin pérdida de datos")

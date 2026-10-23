@@ -20,23 +20,34 @@ struct CellView: View {
 				.frame(width: 80, height: 80)
 				.border(Color.black.opacity(0.1), width: 0.5)
 
-			if let object = cell.element {
-				Image(systemName: object.element.icon(for: object.capitalLetter ?? ""))
-					.resizable()
-					.frame(width: 75, height: 75)
-					.foregroundColor(.black.opacity(0.5))
-					.onDrag {
-						NSItemProvider(object: MurdokuObjectProvider(object: object, row: row, col: col))
-					} preview: {
-						Image(systemName: object.element.icon(for: object.capitalLetter ?? ""))
-							.resizable()
-							.frame(width: 75, height: 75)
-							.foregroundColor(.black.opacity(0.5))
-							.padding(10)
-							.background(Circle().fill(.ultraThinMaterial))
-					}
-			}
+            ForEach(cell.elements, id: \.id) { object in
+                Image(systemName: object.element.icon(for: object.capitalLetter ?? ""))
+                    .resizable()
+                    .frame(width: 65, height: 65) // Reducimos ligeramente para que se note el apilamiento
+                    .foregroundColor(.black.opacity(0.7))
+            }
 		}
+        // El drag se gestiona desde la celda misma o de un objeto específico. 
+        // Para mantener la simplicidad y permitir mover "el objeto de arriba":
+        .onDrag {
+            if let topObject = cell.elements.last {
+                NSItemProvider(object: MurdokuObjectProvider(object: topObject, row: row, col: col))
+            } else {
+                // Si no hay nada para arrastrar, devolvemos un provider vacío o manejamos el error
+				NSItemProvider()
+            }
+        } preview: {
+            if let topObject = cell.elements.last {
+                Image(systemName: topObject.element.icon(for: topObject.capitalLetter ?? ""))
+                    .resizable()
+                    .frame(width: 65, height: 65)
+                    .foregroundColor(.black.opacity(0.7))
+                    .padding(10)
+                    .background(Circle().fill(.ultraThinMaterial))
+            } else {
+                Color.clear
+            }
+        }
 		.onDrop(of: [UTType.murdokuObject], delegate: CellDropDelegate(row: row, col: col, engine: engine))
 	}
 }

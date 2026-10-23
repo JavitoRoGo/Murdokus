@@ -1,3 +1,10 @@
+//
+//  MurdokuModels.swift
+//  Murdokus
+//
+//  Created by Javier Rodríguez Gómez on 19/10/2026.
+//
+
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -59,8 +66,9 @@ struct MurdokuTransferPackage: Codable {
 }
 
 /// Representa una única posición en la cuadrícula.
+/// Ahora contiene un array de objetos para permitir el apilamiento (máximo 2).
 struct Cell {
-    var element: MurdokuObject?
+    var elements: [MurdokuObject] = []
     var color: Color
 }
 

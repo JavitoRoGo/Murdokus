@@ -1,3 +1,10 @@
+//
+//  GridEngineTests.swift
+//  Murdokus
+//
+//  Created by Javier Rodríguez Gómez on 19/10/2026.
+//
+
 import Testing
 import SwiftUI
 @testable import Murdokus
@@ -28,8 +35,10 @@ struct GridEngineTests {
 		
 		engine.handleIntent(.move(package: package, destinationRow: 1, destinationCol: 1))
 		
-		#expect(engine.cells[1][1].element?.name == "Sospechoso 1")
-		#expect(engine.cells[1][1].element?.element == .suspect)
+		// Antes: engine.cells[1][1].element?.name
+		// Ahora: comprobamos el último elemento de la pila
+		#expect(engine.cells[1][1].elements.last?.name == "Sospechoso 1")
+		#expect(engine.cells[1][1].elements.last?.element == .suspect)
 	}
 	
 	@Test("Cambiar el color de la habitación debe actualizar la celda correctamente")
@@ -88,7 +97,7 @@ struct GridEngineTests {
 		engine.handleIntent(.move(package: package, destinationRow: 5, destinationCol: 1))
 		engine.handleIntent(.move(package: package, destinationRow: 1, destinationCol: 5))
 		
-		#expect(engine.cells[1][1].element?.name == "Test")
+		#expect(engine.cells[1][1].elements.last?.name == "Test")
 	}
 
     @Test("Limpiar una celda mediante intención de borrado")
@@ -99,12 +108,12 @@ struct GridEngineTests {
         let packagePre = MurdokuTransferPackage(object: object, sourceRow: -1, sourceCol: -1)
 		engine.handleIntent(.move(package: packagePre, destinationRow: 1, destinationCol: 1))
         
-        #expect(engine.cells[1][1].element != nil)
+        #expect(engine.cells[1][1].elements.count > 0)
         
         let packageDel = MurdokuTransferPackage(object: object, sourceRow: 1, sourceCol: 1)
         engine.handleIntent(.delete(package: packageDel))
         
-        #expect(engine.cells[1][1].element == nil)
+        #expect(engine.cells[1][1].elements.isEmpty)
     }
 
 	@Test("Limpiar fuera de límites debe ser seguro")
@@ -127,9 +136,9 @@ struct GridEngineTests {
 		
 		engine.handleIntent(.move(package: package, destinationRow: 1, destinationCol: 1))
 		
-		#expect(engine.cells[0][1].element == nil)
-		#expect(engine.cells[1][0].element == nil)
-		#expect(engine.cells[1][2].element == nil)
-		#expect(engine.cells[2][1].element == nil)
+		#expect(engine.cells[0][1].elements.isEmpty)
+		#expect(engine.cells[1][0].elements.isEmpty)
+		#expect(engine.cells[1][2].elements.isEmpty)
+		#expect(engine.cells[2][1].elements.isEmpty)
 	}
 }
