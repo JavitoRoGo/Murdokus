@@ -50,8 +50,7 @@ struct TrashDropDelegate: DropDelegate {
 			Task { @MainActor in
 				let decoder = JSONDecoder()
 				if let package = try? decoder.decode(MurdokuTransferPackage.self, from: data) {
-					print("DEBUG: Borrando objeto '\(package.object.name)' de la celda [\(package.sourceRow), \(package.sourceCol)]")
-					engine.clearCell(atRow: package.sourceRow, col: package.sourceCol)
+					engine.handleIntent(.delete(package: package))
 				}
 			}
 		}

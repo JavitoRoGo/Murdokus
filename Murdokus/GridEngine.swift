@@ -23,6 +23,12 @@ final class GridEngine {
 		}
 	}()
 
+    /// Define los tipos de acciones que un usuario puede intentar realizar en el tablero.
+    enum UserIntent {
+        case move(package: MurdokuTransferPackage, destinationRow: Int, destinationCol: Int)
+        case delete(package: MurdokuTransferPackage)
+    }
+
 	func setupGameWith(rows: Int, columns: Int, suspectsNumber: Int) {
 		self.rows = rows
 		self.columns = columns
@@ -55,13 +61,38 @@ final class GridEngine {
 		}
 		self.suspects = suspectsList
 	}
-
-    func setElement(_ element: MurdokuObject?, atRow row: Int, col: Int) {
+	
+    /// El punto único de entrada para cualquier modificación del tablero derivada de la UI.
+    func handleIntent(_ intent: UserIntent) {
+        switch intent {
+        case .move(let package, let destRow, let destCol):
+            performMove(package: package, toRow: destRow, col: destCol)
+            
+        case .delete(let package):
+            performDelete(package: package)
+        }
+    }
+	
+    private func performMove(package: MurdokuTransferPackage, toRow: Int, col: Int) {
+        guard toRow >= 0 && toRow < rows && col >= 0 && col < columns else { return }
+        
+        setElement(package.object, atRow: toRow, col: col)
+        
+        if package.sourceRow != toRow || package.sourceCol != col {
+            clearCell(atRow: package.sourceRow, col: package.sourceCol)
+        }
+    }
+	
+    private func performDelete(package: MurdokuTransferPackage) {
+        clearCell(atRow: package.sourceRow, col: package.sourceCol)
+    }
+	
+	private func setElement(_ element: MurdokuObject?, atRow row: Int, col: Int) {
         guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
         cells[row][col].element = element
     }
 	
-	func clearCell(atRow row: Int, col: Int) {
+	private func clearCell(atRow row: Int, col: Int) {
 		guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
 		self.cells[row][col].element = nil
 	}
