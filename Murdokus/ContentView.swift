@@ -24,5 +24,5 @@ struct ContentView: View {
 
 #Preview {
 	ContentView()
-		.environment(GridEngine(rows: 5, columns: 5, numOfSuspects: 2))
+		.environment(GridEngine())
 }

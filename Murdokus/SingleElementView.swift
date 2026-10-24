@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct SingleElementView: View {
 	let object: MurdokuObject
@@ -15,7 +16,7 @@ struct SingleElementView: View {
 			Text(object.name)
 			Spacer()
 			Image(systemName: object.element.icon(for: object.capitalLetter ?? ""))
-				.font(.title)
+				.font(object.element == .suspect ? .largeTitle : .title2)
 				.padding(10)
 				.background {
 					Circle()
@@ -28,9 +29,19 @@ struct SingleElementView: View {
 			Capsule()
 				.fill(.ultraThinMaterial)
 		}
+        .onDrag {
+			NSItemProvider(object: MurdokuObjectProvider(object: object, row: -1, col: -1))
+		} preview: {
+			Image(systemName: object.element.icon(for: object.capitalLetter ?? ""))
+				.resizable()
+				.frame(width: 75, height: 75)
+				.foregroundColor(.black.opacity(0.5))
+				.padding(10)
+				.background(Circle().fill(.ultraThinMaterial))
+		}
     }
 }
 
 #Preview {
-	SingleElementView(object: MurdokuObject(name: "char", element: .chair))
+    SingleElementView(object: MurdokuObject(name: "char", element: .chair))
 }
