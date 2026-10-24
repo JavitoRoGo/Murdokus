@@ -1,9 +1,9 @@
 import SwiftUI
 
 struct SidebarView: View {
-	@State private var rows: Int = 0
-	@State private var columns: Int = 0
-	@State private var suspects: Int = 0
+	@State private var rows: Int = 3
+	@State private var columns: Int = 3
+	@State private var suspects: Int = 2
 	@Environment(GridEngine.self) private var engine
 	
     var body: some View {

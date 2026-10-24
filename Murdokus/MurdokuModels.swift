@@ -10,17 +10,17 @@ import UniformTypeIdentifiers
 
 /// Representa los tipos de objetos que pueden existir en el tablero.
 enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
-    case suspect = "Sospechoso"
+	case suspect = "Sospechoso"
 	case xMark = "Casilla bloqueada"
-    case chair = "Silla"
-    case table = "Mesa"
-    case rug = "Alfombra"
+	case chair = "Silla"
+	case table = "Mesa"
+	case rug = "Alfombra"
 	case plant = "Planta"
 	case bed = "Cama"
 	case bookshelf = "Estantería"
 	case tv = "TV"
 
-    var id: Self { self }
+	var id: Self { self }
 	
 	func icon(for suspect: String = "") -> String {
 		switch self {
@@ -36,14 +36,14 @@ enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
 		}
 	}
 
-    /// Indica si este elemento permite que se coloque otro objeto encima (ej. una persona sobre una silla).
-    var canStackOnTop: Bool {
-        switch self {
+	/// Indica si este elemento permite que se coloque otro objeto encima (ej. una persona sobre una silla).
+	var canStackOnTop: Bool {
+		switch self {
 		case .chair, .bed, .rug:
-            return true
-        default:
-            return false
-        }
+			return true
+		default:
+			return false
+		}
 	}
 	
 	static var elements: [MurdokuElement] {
@@ -51,25 +51,32 @@ enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
 	}
 }
 
-struct MurdokuObject: Identifiable, Codable {
+struct MurdokuObject: Identifiable, Codable, Transferable {
 	var id: String { name }
 	var name: String
 	var element: MurdokuElement
 	var capitalLetter: String? = nil
+
+	static var transferRepresentation: CodableRepresentation<MurdokuObject, JSONEncoder, JSONDecoder> {
+		CodableRepresentation(contentType: .murdokuObject)
+	}
 }
 
 /// Estructura de transporte que encapsula el objeto y su origen para el Drag & Drop
-struct MurdokuTransferPackage: Codable {
+struct MurdokuTransferPackage: Codable, Transferable {
 	let object: MurdokuObject
 	let sourceRow: Int
 	let sourceCol: Int
+
+	static var transferRepresentation: CodableRepresentation<MurdokuTransferPackage, JSONEncoder, JSONDecoder> {
+		CodableRepresentation(contentType: .murdokuObject)
+	}
 }
 
 /// Representa una única posición en la cuadrícula.
-/// Ahora contiene un array de objetos para permitir el apilamiento (máximo 2).
 struct Cell {
-    var elements: [MurdokuObject] = []
-    var color: Color
+	var elements: [MurdokuObject] = []
+	var color: Color
 }
 
 extension UTType {
