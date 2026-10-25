@@ -13,6 +13,7 @@ final class GridEngine {
 	var columns: Int = 0
 	var cells: [[Cell]] = []
 	var suspects: [MurdokuObject] = []
+	var draggingObject: MurdokuObject? = nil
 	
 	let objects: [MurdokuObject] = {
 		MurdokuElement.elements.map {
@@ -67,12 +68,11 @@ final class GridEngine {
 		case .move(let package, let destRow, let destCol):
 			if canPlaceObject(atRow: destRow, col: destCol, newObject: package.object) {
 				performMove(package: package, toRow: destRow, col: destCol)
-			} else {
-				print("Movimiento no permitido.")
 			}
-			
+			self.draggingObject = nil
 		case .delete(let package):
 			performDelete(package: package)
+			self.draggingObject = nil
 		}
 	}
 	
@@ -92,7 +92,9 @@ final class GridEngine {
 		}
 		
 		if let existingObject = targetCell.elements.last {
-			return existingObject.element.canStackOnTop
+			if let draggingElement = draggingObject?.element, draggingElement == .suspect {
+				return existingObject.element.canStackOnTop
+			}
 		}
 		
 		return false

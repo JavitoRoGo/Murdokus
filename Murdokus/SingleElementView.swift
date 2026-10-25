@@ -9,6 +9,8 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct SingleElementView: View {
+	@Environment(GridEngine.self) private var engine
+	
 	let object: MurdokuObject
 	
     var body: some View {
@@ -30,7 +32,8 @@ struct SingleElementView: View {
 				.fill(.ultraThinMaterial)
 		}
         .onDrag {
-			NSItemProvider(object: MurdokuObjectProvider(object: object, row: -1, col: -1))
+			engine.draggingObject = object
+			return NSItemProvider(object: MurdokuObjectProvider(object: object, row: -1, col: -1))
 		} preview: {
 			Image(systemName: object.element.icon(for: object.capitalLetter ?? ""))
 				.resizable()
@@ -44,4 +47,5 @@ struct SingleElementView: View {
 
 #Preview {
     SingleElementView(object: MurdokuObject(name: "char", element: .chair))
+		.environment(GridEngine())
 }

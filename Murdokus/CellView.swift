@@ -38,9 +38,13 @@ struct CellView: View {
 			return true
 		} isTargeted: { targeted in
 			if targeted {
-				isTargeted = true
-				let dummySuspect = MurdokuObject(name: "Check", element: .suspect)
-				isValidTarget = engine.canPlaceObject(atRow: row, col: col, newObject: dummySuspect)
+				isTargeted = targeted
+				
+				if let dragging = engine.draggingObject {
+					isValidTarget = engine.canPlaceObject(atRow: row, col: col, newObject: dragging)
+				} else {
+					isValidTarget = false
+				}
 			} else {
 				isTargeted = false
 				isValidTarget = false
@@ -48,9 +52,11 @@ struct CellView: View {
 		}
         .onDrag {
             if let topObject = cell.elements.last {
-                NSItemProvider(object: MurdokuObjectProvider(object: topObject, row: row, col: col))
+				engine.draggingObject = topObject
+                return NSItemProvider(object: MurdokuObjectProvider(object: topObject, row: row, col: col))
             } else {
-				NSItemProvider()
+				engine.draggingObject = nil
+				return NSItemProvider()
             }
         } preview: {
             if let topObject = cell.elements.last {
@@ -68,7 +74,7 @@ struct CellView: View {
     
     @ViewBuilder
     private var hoverBackground: some View {
-        if isTargeted {
+		if isTargeted && engine.draggingObject?.element == .suspect {
 			Color(isValidTarget ? .green : .red).opacity(0.2)
         } else {
             Color.clear
@@ -77,7 +83,7 @@ struct CellView: View {
     
     @ViewBuilder
     private var hoverOverlay: some View {
-        if isTargeted {
+		if isTargeted && engine.draggingObject?.element == .suspect {
             Rectangle()
                 .stroke(isValidTarget ? Color.green : Color.red, lineWidth: 3)
         } else {
