@@ -9,10 +9,10 @@ import SwiftUI
 
 struct ElementsView: View {
 	@Environment(GridEngine.self) private var engine
-	
-	var body: some View {
+
+    var body: some View {
 		let columns = [GridItem(.adaptive(minimum: 130))]
-		
+
 		ScrollView {
 			Section {
 				LazyVGrid(columns: columns) {
@@ -24,34 +24,29 @@ struct ElementsView: View {
 				Text("Elementos")
 					.font(.headline)
 			}
-			
+
 			Divider()
-			
+
 			Section {
-				LazyVGrid(columns: columns) {
-					ForEach(engine.suspects) { object in
-						SingleElementView(object: object)
-						if engine.suspects.isEmpty {
-							ContentUnavailableView("Elige el número de sospechosos", systemImage: "person.circle.fill")
-						} else {
-							LazyVGrid(columns: columns) {
-								ForEach(engine.suspects) { object in
-									SingleElementView(object: object)
-								}
-							}
+				if engine.suspects.isEmpty {
+					ContentUnavailableView("Elige el número de sospechosos", systemImage: "person.circle.fill")
+				} else {
+					LazyVGrid(columns: columns) {
+						ForEach(engine.suspects) { object in
+							SingleElementView(object: object)
 						}
 					}
 				}
-				.frame(minWidth: 300)
-				.padding()
-				.background(Color(NSColor.windowBackgroundColor))
 			} header: {
 				Text("Sospechosos")
-						  .font(.headline)
-						  .padding(.vertical, 10)
-				  }
+					.font(.headline)
+					.padding(.vertical, 10)
+			}
 		}
-	}
+		.frame(minWidth: 300)
+		.padding()
+		.background(Color(NSColor.windowBackgroundColor))
+    }
 }
 
 #Preview {

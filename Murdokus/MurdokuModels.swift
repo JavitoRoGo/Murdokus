@@ -1,3 +1,10 @@
+//
+//  MurdokuModels.swift
+//  Murdokus
+//
+//  Created by Javier Rodríguez Gómez on 19/10/2026.
+//
+
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -14,7 +21,7 @@ enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
 	case tv = "TV"
 
 	var id: Self { self }
-	
+
 	func icon(for suspect: String = "") -> String {
 		switch self {
 		case .suspect: "\(suspect.lowercased()).circle.fill"
@@ -29,7 +36,7 @@ enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
 		}
 	}
 
-    /// Indica si este elemento permite que se coloque otro objeto encima (ej. una persona sobre una silla).
+	/// Indica si este elemento permite que se coloque otro objeto encima (ej. una persona sobre una silla).
 	var canStackOnTop: Bool {
 		switch self {
 		case .chair, .bed, .rug:
@@ -38,7 +45,7 @@ enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
 			return false
 		}
 	}
-	
+
 	static var elements: [MurdokuElement] {
 		self.allCases.filter { $0 != .suspect }
 	}

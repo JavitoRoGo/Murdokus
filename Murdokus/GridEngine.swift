@@ -2,7 +2,7 @@
 //  GridEngine.swift
 //  Murdokus
 //
-//  Created by Javier Rodríguez Gómez on 24/10/2026.
+//  Created by Javier Rodríguez Gómez on 19/10/2026.
 //
 
 import SwiftUI
@@ -13,7 +13,7 @@ final class GridEngine {
 	var columns: Int = 0
 	var cells: [[Cell]] = []
 	var suspects: [MurdokuObject] = []
-	
+
 	let objects: [MurdokuObject] = {
 		MurdokuElement.elements.map {
 			MurdokuObject(
@@ -49,19 +49,19 @@ final class GridEngine {
 		}
 		self.cells = newCells
 	}
-	
+
 	private func generateSuspects(num: Int) {
 		let names = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
 		guard num > 0 && num <= names.count else { return }
 		var suspectsList: [MurdokuObject] = []
-		
+
 		for i in 0 ..< num {
 			let suspect = MurdokuObject(name: "Sospechoso \(names[i])", element: .suspect, capitalLetter: names[i])
 			suspectsList.append(suspect)
 		}
 		self.suspects = suspectsList
 	}
-	
+
 	func handleIntent(_ intent: UserIntent) {
 		switch intent {
 		case .move(let package, let destRow, let destCol):
@@ -70,34 +70,34 @@ final class GridEngine {
 			} else {
 				print("Movimiento no permitido.")
 			}
-			
+
 		case .delete(let package):
 			performDelete(package: package)
 		}
 	}
-	
+
 	func canPlaceObject(atRow row: Int, col: Int, newObject: MurdokuObject) -> Bool {
 		guard row >= 0 && row < rows && col >= 0 && col < columns else {
 			return false
 		}
-		
+
 		let targetCell = cells[row][col]
-		
+
 		if targetCell.elements.isEmpty {
 			return true
 		}
-		
+
 		if targetCell.elements.count >= 2 {
 			return false
 		}
-		
+
 		if let existingObject = targetCell.elements.last {
 			return existingObject.element.canStackOnTop
 		}
-		
+
 		return false
 	}
-	
+
 	private func performMove(package: MurdokuTransferPackage, toRow: Int, col: Int) {
 		guard toRow >= 0 && toRow < rows && col >= 0 && col < columns else { return }
 		cells[toRow][col].elements.append(package.object)
@@ -105,7 +105,7 @@ final class GridEngine {
 			clearCellAt(row: package.sourceRow, col: package.sourceCol, objectToRemove: package.object)
 		}
 	}
-	
+
 	private func performDelete(package: MurdokuTransferPackage) {
 		clearCellAt(row: package.sourceRow, col: package.sourceCol, objectToRemove: package.object)
 	}
@@ -114,7 +114,7 @@ final class GridEngine {
 		guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
 		cells[row][col].elements.removeAll(where: { $0.id == objectToRemove.id })
 	}
-	
+
 	private func clearCell(atRow row: Int, col: Int) {
 		guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
 		self.cells[row][col].elements = []
@@ -124,7 +124,7 @@ final class GridEngine {
 		guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
 		cells[row][col].color = newColor
 	}
-	
+
 	func resetGame() {
 		self.rows = 0
 		self.columns = 0
