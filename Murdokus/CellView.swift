@@ -55,7 +55,6 @@ struct CellView: View {
 				engine.draggingObject = topObject
                 return NSItemProvider(object: MurdokuObjectProvider(object: topObject, row: row, col: col))
             } else {
-				engine.draggingObject = nil
 				return NSItemProvider()
             }
         } preview: {
@@ -90,32 +89,4 @@ struct CellView: View {
             Color.clear
         }
     }
-}
-
-struct CellDropDelegate: DropDelegate {
-	let row: Int
-	let col: Int
-	let engine: GridEngine
-	
-	func performDrop(info: DropInfo) -> Bool {
-		guard let itemProvider = info.itemProviders(for: [UTType.murdokuObject]).first else {
-			return false
-		}
-		
-		itemProvider.loadDataRepresentation(forTypeIdentifier: UTType.murdokuObject.identifier) { data, error in
-			guard let data = data, error == nil else { return }
-			
-			Task { @MainActor in
-				let decoder = JSONDecoder()
-				if let package = try? decoder.decode(MurdokuTransferPackage.self, from: data) {
-					engine.handleIntent(.move(package: package, destinationRow: row, destinationCol: col))
-				}
-			}
-		}
-		return true
-	}
-	
-	func validateDrop(info: DropInfo) -> DropProposal? {
-		return DropProposal(operation: .move)
-	}
 }

@@ -67,11 +67,15 @@ final class GridEngine {
 		switch intent {
 		case .move(let package, let destRow, let destCol):
 			if canPlaceObject(atRow: destRow, col: destCol, newObject: package.object) {
-				performMove(package: package, toRow: destRow, col: destCol)
+				withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+					performMove(package: package, toRow: destRow, col: destCol)
+				}
 			}
 			self.draggingObject = nil
 		case .delete(let package):
-			performDelete(package: package)
+			withAnimation(.spring()) {
+				performDelete(package: package)
+			}
 			self.draggingObject = nil
 		}
 	}
@@ -92,7 +96,7 @@ final class GridEngine {
 		}
 		
 		if let existingObject = targetCell.elements.last {
-			if let draggingElement = draggingObject?.element, draggingElement == .suspect {
+			if newObject.element == .suspect {
 				return existingObject.element.canStackOnTop
 			}
 		}
@@ -102,7 +106,11 @@ final class GridEngine {
 	
 	private func performMove(package: MurdokuTransferPackage, toRow: Int, col: Int) {
 		guard toRow >= 0 && toRow < rows && col >= 0 && col < columns else { return }
+		if package.object.element == .suspect {
+			applyXMarkRules(forRow: toRow, col: col)
+		}
 		cells[toRow][col].elements.append(package.object)
+		
 		if package.sourceRow != -1 && (package.sourceRow != toRow || package.sourceCol != col) {
 			clearCellAt(row: package.sourceRow, col: package.sourceCol, objectToRemove: package.object)
 		}
@@ -120,6 +128,20 @@ final class GridEngine {
 	private func clearCell(atRow row: Int, col: Int) {
 		guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
 		self.cells[row][col].elements = []
+	}
+	
+	private func applyXMarkRules(forRow row: Int, col: Int) {
+		let xMarkObject = MurdokuObject(name: "Bloqueo", element: .xMark)
+		
+		for r in 0..<rows {
+			for c in 0..<columns {
+				// No marcamos la celda donde está el sospechoso ni si es la misma posición.
+				if r == row || c == col {
+					guard r != row || c != col else { continue }
+					cells[r][c].elements.append(xMarkObject)
+				}
+			}
+		}
 	}
 
 	func setRoomColor(_ newColor: Color, atRow row: Int, col: Int) {

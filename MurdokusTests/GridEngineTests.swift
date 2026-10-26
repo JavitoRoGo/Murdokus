@@ -141,4 +141,42 @@ struct GridEngineTests {
 		#expect(engine.cells[1][2].elements.isEmpty)
 		#expect(engine.cells[2][1].elements.isEmpty)
 	}
+	
+	@Test("Al colocar un sospechoso, se deben añadir marcas X en su fila y columna")
+	func testApplyXMarkRulesBasic() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0)
+		let suspect = MurdokuObject(name: "Sospechoso A", element: .suspect)
+		let package = MurdokuTransferPackage(object: suspect, sourceRow: -1, sourceCol: -1)
+		
+		// Colocamos el sospechoso en la posición central (1, 1)
+		engine.handleIntent(.move(package: package, destinationRow: 1, destinationCol: 1))
+		
+		// Las celdas (1,0), (1,2), (0,1) y (2,1) deben tener una X
+		#expect(engine.cells[1][0].elements.contains { $0.element == .xMark })
+		#expect(engine.cells[1][2].elements.contains { $0.element == .xMark })
+		#expect(engine.cells[0][1].elements.contains { $0.element == .xMark })
+		#expect(engine.cells[2][1].elements.contains { $0.element == .xMark })
+		
+		// La celda destino (1,1) NO debe tener una X
+		#expect(engine.cells[1][1].elements.contains { $0.element != .xMark })
+	}
+
+	@Test("Las marcas X deben añadirse ENCIMA de objetos existentes sin eliminarlos")
+	func testApplyXMarkRulesOverlay() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0)
+		let chair = MurdokuObject(name: "Silla", element: .chair)
+		let packageChair = MurdokuTransferPackage(object: chair, sourceRow: -1, sourceCol: -1)
+		engine.handleIntent(.move(package: packageChair, destinationRow: 1, destinationCol: 0))
+		
+		// Colocamos un sospechoso en (1, 2) -> Comparte la fila 1 con la silla
+		let suspect = MurdokuObject(name: "Sospechoso A", element: .suspect)
+		let packageSuspect = MurdokuTransferPackage(object: suspect, sourceRow: -1, sourceCol: -1)
+		engine.handleIntent(.move(package: packageSuspect, destinationRow: 1, destinationCol: 2))
+		
+		// La celda (1, 0) debe contener AMBOS elementos: la silla y la X
+		let cellElements = engine.cells[1][0].elements
+		#expect(cellElements.contains { $0.element == .chair })
+		#expect(cellElements.contains { $0.element == .xMark })
+		#expect(cellElements.count == 2)
+	}
 }
