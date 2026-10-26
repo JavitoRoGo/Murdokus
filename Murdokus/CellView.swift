@@ -38,9 +38,13 @@ struct CellView: View {
 			return true
 		} isTargeted: { targeted in
 			if targeted {
-				isTargeted = true
-				let dummySuspect = MurdokuObject(name: "Check", element: .suspect)
-				isValidTarget = engine.canPlaceObject(atRow: row, col: col, newObject: dummySuspect)
+				isTargeted = targeted
+				
+				if let dragging = engine.draggingObject {
+					isValidTarget = engine.canPlaceObject(atRow: row, col: col, newObject: dragging)
+				} else {
+					isValidTarget = false
+				}
 			} else {
 				isTargeted = false
 				isValidTarget = false
@@ -48,9 +52,10 @@ struct CellView: View {
 		}
         .onDrag {
             if let topObject = cell.elements.last {
-                NSItemProvider(object: MurdokuObjectProvider(object: topObject, row: row, col: col))
+				engine.draggingObject = topObject
+                return NSItemProvider(object: MurdokuObjectProvider(object: topObject, row: row, col: col))
             } else {
-				NSItemProvider()
+				return NSItemProvider()
             }
         } preview: {
             if let topObject = cell.elements.last {
@@ -68,7 +73,7 @@ struct CellView: View {
     
     @ViewBuilder
     private var hoverBackground: some View {
-        if isTargeted {
+		if isTargeted && engine.draggingObject?.element == .suspect {
 			Color(isValidTarget ? .green : .red).opacity(0.2)
         } else {
             Color.clear
@@ -77,39 +82,11 @@ struct CellView: View {
     
     @ViewBuilder
     private var hoverOverlay: some View {
-        if isTargeted {
+		if isTargeted && engine.draggingObject?.element == .suspect {
             Rectangle()
                 .stroke(isValidTarget ? Color.green : Color.red, lineWidth: 3)
         } else {
             Color.clear
         }
     }
-}
-
-struct CellDropDelegate: DropDelegate {
-	let row: Int
-	let col: Int
-	let engine: GridEngine
-	
-	func performDrop(info: DropInfo) -> Bool {
-		guard let itemProvider = info.itemProviders(for: [UTType.murdokuObject]).first else {
-			return false
-		}
-		
-		itemProvider.loadDataRepresentation(forTypeIdentifier: UTType.murdokuObject.identifier) { data, error in
-			guard let data = data, error == nil else { return }
-			
-			Task { @MainActor in
-				let decoder = JSONDecoder()
-				if let package = try? decoder.decode(MurdokuTransferPackage.self, from: data) {
-					engine.handleIntent(.move(package: package, destinationRow: row, destinationCol: col))
-				}
-			}
-		}
-		return true
-	}
-	
-	func validateDrop(info: DropInfo) -> DropProposal? {
-		return DropProposal(operation: .move)
-	}
 }

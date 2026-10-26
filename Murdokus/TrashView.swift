@@ -5,13 +5,10 @@ struct TrashView: View {
     @Environment(GridEngine.self) private var engine
 
     var body: some View {
-        VStack {
-            Spacer()
-            
+        VStack(spacing: 10) {
             ZStack {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(.ultraThinMaterial)
-                    .frame(width: 80, height: 80)
                     .overlay(
                         Image(systemName: "trash")
                             .font(.largeTitle)
@@ -22,6 +19,7 @@ struct TrashView: View {
                     .contentShape(Rectangle())
                     .onDrop(of: [UTType.murdokuObject], delegate: TrashDropDelegate(engine: engine))
             }
+			.frame(width: 80, height: 80)
             
             Text("Arrastra aquí para borrar")
                 .font(.caption)
@@ -44,7 +42,7 @@ struct TrashDropDelegate: DropDelegate {
 			return false
 		}
 		
-		itemProvider.loadDataRepresentation(forTypeIdentifier: MurdokuObjectProvider.typeIdentifier) { data, error in
+		itemProvider.loadDataRepresentation(forTypeIdentifier: UTType.murdokuObject.identifier) { data, error in
 			guard let data = data, error == nil else { return }
 			
 			Task { @MainActor in

@@ -21,7 +21,7 @@ enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
 	case tv = "TV"
 
 	var id: Self { self }
-
+	
 	func icon(for suspect: String = "") -> String {
 		switch self {
 		case .suspect: "\(suspect.lowercased()).circle.fill"
@@ -45,7 +45,7 @@ enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
 			return false
 		}
 	}
-
+	
 	static var elements: [MurdokuElement] {
 		self.allCases.filter { $0 != .suspect }
 	}

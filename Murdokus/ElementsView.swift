@@ -9,10 +9,10 @@ import SwiftUI
 
 struct ElementsView: View {
 	@Environment(GridEngine.self) private var engine
-
+	
     var body: some View {
 		let columns = [GridItem(.adaptive(minimum: 130))]
-
+		
 		ScrollView {
 			Section {
 				LazyVGrid(columns: columns) {
@@ -24,9 +24,9 @@ struct ElementsView: View {
 				Text("Elementos")
 					.font(.headline)
 			}
-
+			
 			Divider()
-
+			
 			Section {
 				if engine.suspects.isEmpty {
 					ContentUnavailableView("Elige el número de sospechosos", systemImage: "person.circle.fill")

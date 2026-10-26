@@ -18,7 +18,7 @@ struct GridView: View {
 							}
 						}
 					}
-
+					
 					TrashView()
 				}
 				.padding(20)
