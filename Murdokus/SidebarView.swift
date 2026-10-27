@@ -34,10 +34,12 @@ struct SidebarView: View {
 			
 			HStack(spacing: 10) {
 				Button("Configurar") {
+					engine.showingSuspects = false
 					engine.setupGameWith(rows: rows, columns: columns, suspectsNumber: suspects, colors: gridColors)
 				}
 				.buttonStyle(.bordered)
 				Button("Borrar", role: .destructive) {
+					engine.showingSuspects = false
 					rows = 0
 					columns = 0
 					suspects = 0

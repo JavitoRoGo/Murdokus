@@ -14,37 +14,55 @@ struct ElementsView: View {
 		let columns = [GridItem(.adaptive(minimum: 130))]
 		
 		ScrollView {
-			Section {
-				if engine.roomColors.isEmpty {
-					ContentUnavailableView("Elige el número de espacios", systemImage: "paintbrush")
-				} else {
-					LazyVGrid(columns: columns) {
-						ForEach(engine.roomColors, id: \.self) { color in
-							RoomColorView(roomColor: color)
-						}
-					}
-				}
-			} header: {
-				Text("Espacios")
-					.font(.headline)
-					.padding(.vertical, 10)
-			}
-			
-			if !engine.roomColors.isEmpty {
-				Divider()
+			if !engine.showingSuspects {
 				Section {
-					LazyVGrid(columns: columns) {
-						ForEach(engine.objects) { object in
-							SingleElementView(object: object)
+					if engine.roomColors.isEmpty {
+						ContentUnavailableView("Elige el número de espacios", systemImage: "paintbrush")
+					} else {
+						LazyVGrid(columns: columns) {
+							ForEach(engine.roomColors, id: \.self) { color in
+								RoomColorView(roomColor: color)
+							}
 						}
 					}
 				} header: {
-					Text("Elementos")
+					Text("Espacios")
 						.font(.headline)
+						.padding(.vertical, 10)
+				}
+				
+				if !engine.roomColors.isEmpty {
+					Divider()
+					Section {
+						LazyVGrid(columns: columns) {
+							ForEach(engine.objects) { object in
+								SingleElementView(object: object)
+							}
+						}
+					} header: {
+						Text("Elementos")
+							.font(.headline)
+					}
+					
+					Divider()
+					
+					Button() {
+						withAnimation {
+							engine.showingSuspects = true
+						}
+					} label: {
+						Text("Comenzar")
+							.font(.largeTitle)
+					}
+					.buttonStyle(.borderedProminent)
+				}
+			} else {
+				LazyVGrid(columns: columns) {
+					ForEach(engine.suspects) { suspect in
+						SingleElementView(object: suspect)
+					}
 				}
 			}
-			
-			Divider()
 		}
 		.frame(minWidth: 300)
 		.padding()
