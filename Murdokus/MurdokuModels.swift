@@ -73,6 +73,17 @@ struct MurdokuTransferPackage: Codable, Transferable {
 	}
 }
 
+struct MurdokuColorPackage: Codable, Transferable {
+	let red: Double
+	let green: Double
+	let blue: Double
+	let opacity: Double
+	
+	static var transferRepresentation: CodableRepresentation<MurdokuColorPackage, JSONEncoder, JSONDecoder> {
+		CodableRepresentation(contentType: .murdokuColor)
+	}
+}
+
 /// Representa una única posición en la cuadrícula.
 struct Cell {
 	var elements: [MurdokuObject] = []
@@ -81,4 +92,5 @@ struct Cell {
 
 extension UTType {
 	static let murdokuObject = UTType("com.murdoku.object")!
+	static let murdokuColor = UTType("com.murdoku.color")!
 }

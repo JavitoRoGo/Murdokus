@@ -14,6 +14,7 @@ final class GridEngine {
 	var cells: [[Cell]] = []
 	var suspects: [MurdokuObject] = []
 	var draggingObject: MurdokuObject? = nil
+	var roomColors: [Color] = []
 	
 	let objects: [MurdokuObject] = {
 		MurdokuElement.elements.map {
@@ -28,16 +29,17 @@ final class GridEngine {
 	enum UserIntent {
 		case move(package: MurdokuTransferPackage, destinationRow: Int, destinationCol: Int)
 		case delete(package: MurdokuTransferPackage)
+		case changeColor(color: Color, row: Int, col: Int)
 	}
 
-	func setupGameWith(rows: Int, columns: Int, suspectsNumber: Int) {
+	func setupGameWith(rows: Int, columns: Int, suspectsNumber: Int, colors: Int) {
 		self.rows = rows
 		self.columns = columns
-		generateGrid()
+		generateGridAndColors(num: colors)
 		generateSuspects(num: suspectsNumber)
 	}
 
-	private func generateGrid() {
+	private func generateGridAndColors(num: Int) {
 		guard rows > 0 && columns > 0 else { return }
 		var newCells: [[Cell]] = []
 
@@ -49,6 +51,9 @@ final class GridEngine {
 			newCells.append(row)
 		}
 		self.cells = newCells
+		
+		let colors: [Color] = [.red, .blue, .yellow, .green, .orange, .purple, .brown, .pink, .mint, .indigo]
+		self.roomColors = colors.prefix(upTo: num).map { $0.opacity(0.5) }
 	}
 	
 	private func generateSuspects(num: Int) {
@@ -77,6 +82,8 @@ final class GridEngine {
 				performDelete(package: package)
 			}
 			self.draggingObject = nil
+		case .changeColor(let color, let row, let col):
+			setRoomColor(color, atRow: row, col: col)
 		}
 	}
 	
@@ -144,7 +151,7 @@ final class GridEngine {
 		}
 	}
 
-	func setRoomColor(_ newColor: Color, atRow row: Int, col: Int) {
+	private func setRoomColor(_ newColor: Color, atRow row: Int, col: Int) {
 		guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
 		cells[row][col].color = newColor
 	}
@@ -154,5 +161,6 @@ final class GridEngine {
 		self.columns = 0
 		self.suspects = []
 		self.cells = []
+		self.roomColors = []
 	}
 }

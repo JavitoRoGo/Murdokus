@@ -15,33 +15,36 @@ struct ElementsView: View {
 		
 		ScrollView {
 			Section {
-				LazyVGrid(columns: columns) {
-					ForEach(engine.objects) { object in
-						SingleElementView(object: object)
-					}
-				}
-			} header: {
-				Text("Elementos")
-					.font(.headline)
-			}
-			
-			Divider()
-			
-			Section {
-				if engine.suspects.isEmpty {
-					ContentUnavailableView("Elige el número de sospechosos", systemImage: "person.circle.fill")
+				if engine.roomColors.isEmpty {
+					ContentUnavailableView("Elige el número de espacios", systemImage: "paintbrush")
 				} else {
 					LazyVGrid(columns: columns) {
-						ForEach(engine.suspects) { object in
-							SingleElementView(object: object)
+						ForEach(engine.roomColors, id: \.self) { color in
+							RoomColorView(roomColor: color)
 						}
 					}
 				}
 			} header: {
-				Text("Sospechosos")
+				Text("Espacios")
 					.font(.headline)
 					.padding(.vertical, 10)
 			}
+			
+			if !engine.roomColors.isEmpty {
+				Divider()
+				Section {
+					LazyVGrid(columns: columns) {
+						ForEach(engine.objects) { object in
+							SingleElementView(object: object)
+						}
+					}
+				} header: {
+					Text("Elementos")
+						.font(.headline)
+				}
+			}
+			
+			Divider()
 		}
 		.frame(minWidth: 300)
 		.padding()
