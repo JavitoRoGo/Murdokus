@@ -3,6 +3,7 @@ import SwiftUI
 struct SidebarView: View {
 	@State private var rows: Int = 3
 	@State private var columns: Int = 3
+	@State private var gridColors: Int = 1
 	@State private var suspects: Int = 2
 	@Environment(GridEngine.self) private var engine
 	
@@ -17,6 +18,12 @@ struct SidebarView: View {
 				}
             }
 			
+			Section("Espacios") {
+				Stepper(value: $gridColors, in: 0...10) {
+					Text("Espacios: \(gridColors)")
+				}
+			}
+			
 			Section("Sospechosos") {
 				Stepper(value: $suspects, in: 0...26) {
 					Text("Sospechosos: \(suspects)")
@@ -26,14 +33,17 @@ struct SidebarView: View {
 			Spacer()
 			
 			HStack(spacing: 10) {
-				Button("Empezar") {
-					engine.setupGameWith(rows: rows, columns: columns, suspectsNumber: suspects)
+				Button("Configurar") {
+					engine.showingSuspects = false
+					engine.setupGameWith(rows: rows, columns: columns, suspectsNumber: suspects, colors: gridColors)
 				}
 				.buttonStyle(.bordered)
 				Button("Borrar", role: .destructive) {
+					engine.showingSuspects = false
 					rows = 0
 					columns = 0
 					suspects = 0
+					gridColors = 0
 					engine.resetGame()
 				}
 			}
