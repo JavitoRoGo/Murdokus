@@ -18,17 +18,18 @@ struct GridEngineTests {
 		let rows = 5
 		let cols = 10
 		
-		engine.setupGameWith(rows: rows, columns: cols, suspectsNumber: 3)
+		engine.setupGameWith(rows: rows, columns: cols, suspectsNumber: 3, colors: 1)
 		
 		#expect(engine.rows == rows)
 		#expect(engine.columns == cols)
 		#expect(engine.cells.count == rows)
 		#expect(engine.cells.first?.count == cols)
+		#expect(engine.roomColors.count == 1)
 	}
 	
 	@Test("Colocar un elemento debe actualizar la celda correcta mediante una intención de movimiento")
 	func testSetElement() {
-		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0)
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0, colors: 1)
 		let object = MurdokuObject(name: "Sospechoso 1", element: .suspect)
 		
 		let package = MurdokuTransferPackage(object: object, sourceRow: -1, sourceCol: -1)
@@ -43,10 +44,10 @@ struct GridEngineTests {
 	
 	@Test("Cambiar el color de la habitación debe actualizar la celda correctamente")
 	func testSetRoomColor() {
-		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0)
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0, colors: 1)
 		let targetColor = Color.red
 		
-		engine.setRoomColor(targetColor, atRow: 2, col: 2)
+		engine.handleIntent(.changeColor(color: targetColor, row: 2, col: 2))
 		
 		#expect(engine.cells[2][2].color == targetColor)
 		#expect(engine.cells[0][0].color == Color.secondary.opacity(0.2))
@@ -66,7 +67,7 @@ struct GridEngineTests {
 	@Test("setupGameWith debe generar los sospechosos con nombres y letras correctas")
 	func testSuspectGeneration() {
 		let numSuspects = 3
-		engine.setupGameWith(rows: 2, columns: 2, suspectsNumber: numSuspects)
+		engine.setupGameWith(rows: 2, columns: 2, suspectsNumber: numSuspects, colors: 1)
 		
 		#expect(engine.suspects.count == numSuspects)
 		#expect(engine.suspects[0].name == "Sospechoso A")
@@ -75,7 +76,7 @@ struct GridEngineTests {
 	
 	@Test("resetGame debe limpiar completamente el estado del motor")
 	func testResetGame() {
-		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 2)
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 2, colors: 1)
 		
 		engine.resetGame()
 		
@@ -89,7 +90,7 @@ struct GridEngineTests {
 	func testBoundsChecking() {
 		let rows = 3
 		let cols = 3
-		engine.setupGameWith(rows: rows, columns: cols, suspectsNumber: 0)
+		engine.setupGameWith(rows: rows, columns: cols, suspectsNumber: 0, colors: 1)
 		let object = MurdokuObject(name: "Test", element: .chair)
 		
 		let package = MurdokuTransferPackage(object: object, sourceRow: 1, sourceCol: 1)
@@ -102,7 +103,7 @@ struct GridEngineTests {
 
     @Test("Limpiar una celda mediante intención de borrado")
     func testClearCell() {
-        engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0)
+        engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0, colors: 1)
         let object = MurdokuObject(name: "Mesa", element: .table)
         
         let packagePre = MurdokuTransferPackage(object: object, sourceRow: -1, sourceCol: -1)
@@ -118,7 +119,7 @@ struct GridEngineTests {
 
 	@Test("Limpiar fuera de límites debe ser seguro")
 	func testClearCellOutOfBounds() {
-		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0)
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0, colors: 1)
 		
 		let dummyObject = MurdokuObject(name: "Dummy", element: .table)
 		let package = MurdokuTransferPackage(object: dummyObject, sourceRow: -1, sourceCol: 5)
@@ -130,7 +131,7 @@ struct GridEngineTests {
 
 	@Test("Colocar un objeto no debe afectar a las celdas adyacentes")
 	func testPlacementSideEffects() {
-		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0)
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0, colors: 1)
 		let object = MurdokuObject(name: "Planta", element: .plant)
 		let package = MurdokuTransferPackage(object: object, sourceRow: -1, sourceCol: -1)
 		
@@ -144,7 +145,7 @@ struct GridEngineTests {
 	
 	@Test("Al colocar un sospechoso, se deben añadir marcas X en su fila y columna")
 	func testApplyXMarkRulesBasic() {
-		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0)
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0, colors: 1)
 		let suspect = MurdokuObject(name: "Sospechoso A", element: .suspect)
 		let package = MurdokuTransferPackage(object: suspect, sourceRow: -1, sourceCol: -1)
 		
@@ -163,7 +164,7 @@ struct GridEngineTests {
 
 	@Test("Las marcas X deben añadirse ENCIMA de objetos existentes sin eliminarlos")
 	func testApplyXMarkRulesOverlay() {
-		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0)
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0, colors: 1)
 		let chair = MurdokuObject(name: "Silla", element: .chair)
 		let packageChair = MurdokuTransferPackage(object: chair, sourceRow: -1, sourceCol: -1)
 		engine.handleIntent(.move(package: packageChair, destinationRow: 1, destinationCol: 0))
