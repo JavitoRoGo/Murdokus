@@ -17,6 +17,8 @@ final class GridEngine {
 	var roomColors: [Color] = []
 	var showingSuspects = false
 	
+	var activePaintColor: Color? = nil
+	
 	let objects: [MurdokuObject] = {
 		MurdokuElement.elements.map {
 			MurdokuObject(

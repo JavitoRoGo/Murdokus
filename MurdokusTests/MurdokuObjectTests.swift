@@ -51,7 +51,7 @@ struct MurdokuObjectTests {
 		let data = try encoder.encode(package)
 		let decodedPackage = try decoder.decode(MurdokuTransferPackage.self, from: data)
 		
-		await #expect(decodedPackage.object.name == "Test")
+		#expect(decodedPackage.object.name == "Test")
 		#expect(decodedPackage.sourceRow == 1)
 		#expect(decodedPackage.sourceCol == 2)
 	}

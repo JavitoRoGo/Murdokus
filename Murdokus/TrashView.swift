@@ -20,10 +20,14 @@ struct TrashView: View {
                     .onDrop(of: [UTType.murdokuObject], delegate: TrashDropDelegate(engine: engine))
             }
 			.frame(width: 80, height: 80)
+			.onTapGesture {
+				engine.activePaintColor = nil
+			}
             
-            Text("Arrastra aquí para borrar")
+            Text("Arrastra aquí para borrar.\nToca para borrar la selección del color.")
                 .font(.caption)
                 .foregroundColor(.secondary)
+				.multilineTextAlignment(.center)
                 .padding(.bottom, 10)
         }
     }
