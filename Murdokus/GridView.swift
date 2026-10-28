@@ -24,6 +24,7 @@ struct GridView: View {
 					
 					TrashView()
 				}
+				.padding(20)
 			}
         }
         .background(Color(NSColor.windowBackgroundColor))

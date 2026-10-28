@@ -38,14 +38,6 @@ struct RoomColorView: View {
 		.onTapGesture {
 			engine.activePaintColor = roomColor
 		}
-		.onDrag {
-			let provider = MurdokuColorProvider(color: roomColor)
-			return NSItemProvider(object: provider)
-		} preview: {
-			Circle()
-				.fill(roomColor)
-				.frame(width: 75, height: 75)
-		}
 	}
 }
 
