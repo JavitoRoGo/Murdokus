@@ -17,6 +17,8 @@ final class GridEngine {
 	var roomColors: [Color] = []
 	var showingSuspects = false
 	
+	var activePaintColor: Color? = nil
+	
 	let objects: [MurdokuObject] = {
 		MurdokuElement.elements.map {
 			MurdokuObject(
@@ -54,7 +56,7 @@ final class GridEngine {
 		self.cells = newCells
 		
 		let colors: [Color] = [.red, .blue, .yellow, .green, .orange, .purple, .brown, .pink, .mint, .indigo]
-		self.roomColors = colors.prefix(upTo: num).map { $0.opacity(0.5) }
+		self.roomColors = colors.prefix(upTo: num).map { $0.opacity(0.3) }
 	}
 	
 	private func generateSuspects(num: Int) {

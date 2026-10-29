@@ -56,7 +56,7 @@ struct CellView: View {
 //			engine.handleIntent(.changeColor(color: newColor, row: row, col: col))
 //			return true
 //		}
-		.onDrop(of: [UTType.murdokuObject, UTType.murdokuColor], delegate: CellDropDelegate(row: row, col: col, engine: engine, isTargeted: $isTargeted, isValidTarget: $isValidTarget))
+		.onDrop(of: [UTType.murdokuObject], delegate: CellDropDelegate(row: row, col: col, engine: engine, isTargeted: $isTargeted, isValidTarget: $isValidTarget))
         .onDrag {
             if let topObject = cell.elements.last {
 				engine.draggingObject = topObject
@@ -105,60 +105,36 @@ struct CellDropDelegate: DropDelegate {
 	@Binding var isTargeted: Bool
 	@Binding var isValidTarget: Bool
 	
-	// 1. Detectar cuando el objeto entra en la celda (para el hover)
 	func dropEntered(info: DropInfo) {
 		isTargeted = true
 		
-		// Lógica para determinar si es un destino válido (el borde verde/rojo)
 		if let dragging = engine.draggingObject {
 			isValidTarget = engine.canPlaceObject(atRow: row, col: col, newObject: dragging)
 		} else {
-			// Si no hay objeto de la cuadrícula, podría ser un color.
-			// Como el drag del color no pone nada en 'engine.draggingObject',
-			// para los colores siempre permitimos el hover (o puedes añadir lógica extra).
 			isValidTarget = false
 		}
 	}
 	
-	// 2. Detectar cuando el objeto sale de la celda (para quitar el hover)
 	func dropExited(info: DropInfo) {
 		isTargeted = false
 		isValidTarget = false
 	}
 	
-	// 3. Validar si se permite la operación (el icono del ratón)
 	func validateDrop(info: DropInfo) -> DropProposal? {
-		if info.hasItemsConforming(to: [UTType.murdokuObject, UTType.murdokuColor]) {
+		if info.hasItemsConforming(to: [UTType.murdokuObject]) {
 			return DropProposal(operation: .move)
 		}
 		return nil
 	}
 	
-	// 4. Ejecutar la acción al soltar
 	func performDrop(info: DropInfo) -> Bool {
-		if let provider = info.itemProviders(for: [UTType.murdokuObject, UTType.murdokuColor]).first {
+		if let provider = info.itemProviders(for: [UTType.murdokuObject]).first {
 			provider.loadDataRepresentation(forTypeIdentifier: UTType.murdokuObject.identifier) { data, error in
 				guard let data = data, error == nil else { return }
 				Task { @MainActor in
 					let decoder = JSONDecoder()
 					if let package = try? decoder.decode(MurdokuTransferPackage.self, from: data) {
 						engine.handleIntent(.move(package: package, destinationRow: row, destinationCol: col))
-					}
-				}
-			}
-		
-			provider.loadDataRepresentation(forTypeIdentifier: UTType.murdokuColor.identifier) { data, error in
-				guard let data = data, error == nil else { return }
-				Task { @MainActor in
-					let decoder = JSONDecoder()
-					if let package = try? decoder.decode(MurdokuColorPackage.self, from: data) {
-						let newColor = ColorHelper.composeColor(
-							red: package.red,
-							green: package.green,
-							blue: package.blue,
-							opacity: package.opacity
-						)
-						engine.handleIntent(.changeColor(color: newColor, row: row, col: col))
 					}
 				}
 			}

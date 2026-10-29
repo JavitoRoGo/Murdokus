@@ -14,6 +14,9 @@ struct GridView: View {
 							HStack(spacing: 0) {
 								ForEach(0..<engine.columns, id: \.self) { col in
 									CellView(cell: engine.cells[row][col], row: row, col: col)
+										.onTapGesture {
+											applyColorToCell(row: row, col: col)
+										}
 								}
 							}
 						}
@@ -26,6 +29,12 @@ struct GridView: View {
         }
         .background(Color(NSColor.windowBackgroundColor))
         .frame(minWidth: max(200, CGFloat(90 * engine.columns)))
+    }
+
+    private func applyColorToCell(row: Int, col: Int) {
+        guard let activeColor = engine.activePaintColor else { return }
+        
+        engine.handleIntent(.changeColor(color: activeColor, row: row, col: col))
     }
 }
 
