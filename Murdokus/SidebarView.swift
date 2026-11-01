@@ -10,10 +10,10 @@ struct SidebarView: View {
     var body: some View {
         List {
             Section("Tablero") {
-				Stepper(value: $rows, in: 0...20) {
+				Stepper(value: $rows, in: 0...9) {
 					Text("Filas: \(rows)")
 				}
-				Stepper(value: $columns, in: 0...20) {
+				Stepper(value: $columns, in: 0...9) {
 					Text("Columnas: \(columns)")
 				}
             }
@@ -25,7 +25,7 @@ struct SidebarView: View {
 			}
 			
 			Section("Sospechosos") {
-				Stepper(value: $suspects, in: 0...26) {
+				Stepper(value: $suspects, in: 0...8) {
 					Text("Sospechosos: \(suspects)")
 				}
             }
@@ -35,6 +35,7 @@ struct SidebarView: View {
 			HStack(spacing: 10) {
 				Button("Configurar") {
 					engine.showingSuspects = false
+					engine.handleTimer(.reset)
 					engine.setupGameWith(rows: rows, columns: columns, suspectsNumber: suspects, colors: gridColors)
 				}
 				.buttonStyle(.bordered)
@@ -44,6 +45,7 @@ struct SidebarView: View {
 					columns = 0
 					suspects = 0
 					gridColors = 0
+					engine.handleTimer(.reset)
 					engine.resetGame()
 				}
 			}

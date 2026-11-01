@@ -19,6 +19,10 @@ final class GridEngine {
 	
 	var activePaintColor: Color? = nil
 	
+	var elapsedTime: TimeInterval = 0
+	var isTimerRunning = false
+	var timerStartDate: Date?
+	
 	let objects: [MurdokuObject] = {
 		MurdokuElement.elements.map {
 			MurdokuObject(
@@ -34,8 +38,13 @@ final class GridEngine {
 		case delete(package: MurdokuTransferPackage)
 		case changeColor(color: Color, row: Int, col: Int)
 	}
+	
+	enum TimerIntent {
+		case start, pause, reset
+	}
 
 	func setupGameWith(rows: Int, columns: Int, suspectsNumber: Int, colors: Int) {
+		resetTimer()
 		self.rows = rows
 		self.columns = columns
 		generateGridAndColors(num: colors)
@@ -87,6 +96,17 @@ final class GridEngine {
 			self.draggingObject = nil
 		case .changeColor(let color, let row, let col):
 			setRoomColor(color, atRow: row, col: col)
+		}
+	}
+	
+	func handleTimer(_ intent: TimerIntent) {
+		switch intent {
+		case .start:
+			startTimer()
+		case .pause:
+			pauseTimer()
+		case .reset:
+			resetTimer()
 		}
 	}
 	
@@ -159,11 +179,36 @@ final class GridEngine {
 		cells[row][col].color = newColor
 	}
 	
+	private func startTimer() {
+		guard !isTimerRunning else { return }
+		isTimerRunning = true
+		timerStartDate = Date()
+	}
+
+	private func pauseTimer() {
+		guard isTimerRunning else { return }
+		elapsedTime += Date().timeIntervalSince(timerStartDate ?? Date())
+		isTimerRunning = false
+		timerStartDate = nil
+	}
+
+	private func resetTimer() {
+		elapsedTime = 0
+		isTimerRunning = false
+		timerStartDate = nil
+	}
+
+	var elapsedSeconds: TimeInterval {
+		guard isTimerRunning, let timerStartDate else { return elapsedTime }
+		return elapsedTime + Date().timeIntervalSince(timerStartDate)
+	}
+
 	func resetGame() {
 		self.rows = 0
 		self.columns = 0
 		self.suspects = []
 		self.cells = []
 		self.roomColors = []
+		resetTimer()
 	}
 }
