@@ -47,8 +47,6 @@ struct SingleElementView: View {
 		}
     }
 	
-	/// Determina si el elemento puede arrastrarse desde el panel.
-	/// Los sospechosos ya colocados y la victima (mientras no se hayan colocado todos los sospechosos) estan desactivados.
 	var canDrag: Bool {
 		switch object.element {
 		case .victim:

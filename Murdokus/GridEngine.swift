@@ -7,26 +7,44 @@
 
 import SwiftUI
 
+/// The central engine responsible for managing the game state, grid logic, and timer for Murdokus.
+///
+/// `GridEngine` acts as the single source of truth for the game board, handling the placement
+/// of suspects and objects, applying game rules (such as X-marks), and tracking the time elapsed.
+/// It is designed to be injected into the environment and observed by SwiftUI views.
 @Observable
 final class GridEngine {
+	/// The number of rows in the game grid.
 	var rows: Int = 0
+	/// The number of columns in the game grid.
 	var columns: Int = 0
+	/// A 2D array representing the grid cells and the objects contained within them.
 	var cells: [[Cell]] = []
+	/// The list of suspects involved in the current game session.
 	var suspects: [MurdokuObject] = []
+	/// The object currently being dragged across the grid, if any.
 	var draggingObject: MurdokuObject? = nil
+	/// The set of available colors used to paint the rooms in the grid.
 	var roomColors: [Color] = []
+	/// Controls whether the suspect list is visible in the user interface.
 	var showingSuspects = false
 	
+	/// A boolean indicating whether all suspects have been placed on the grid.
 	var allSuspectsPlaced: Bool {
 		suspects.allSatisfy { $0.isPlaced ?? false }
 	}
 	
+	/// The current color selected for painting cells.
 	var activePaintColor: Color? = nil
 	
+	/// Total time elapsed in seconds, excluding the current active timer session.
 	var elapsedTime: TimeInterval = 0
+	/// Indicates whether the game timer is currently counting up.
 	var isTimerRunning = false
+	/// The timestamp when the current timer session started.
 	var timerStartDate: Date?
 	
+	/// A static list of all available game objects derived from `MurdokuElement`.
 	let objects: [MurdokuObject] = {
 		MurdokuElement.elements.map {
 			MurdokuObject(
@@ -36,16 +54,33 @@ final class GridEngine {
 		}
 	}()
 	
+	/// Represents a user-driven action that modifies the game state.
 	enum UserIntent {
+		/// Moves an object to a specific grid coordinate.
 		case move(package: MurdokuTransferPackage, destinationRow: Int, destinationCol: Int)
+		/// Removes a specific object from the grid.
 		case delete(package: MurdokuTransferPackage)
+		/// Changes the background color of a specific cell.
 		case changeColor(color: Color, row: Int, col: Int)
 	}
 	
+	/// Represents an action that modifies the state of the game timer.
 	enum TimerIntent {
-		case start, pause, reset
+		/// Starts or resumes the timer.
+		case start
+		/// Pauses the timer and saves the current elapsed time.
+		case pause
+		/// Resets the timer to zero.
+		case reset
 	}
 
+	/// Initializes a new game session with the specified grid dimensions and complexity.
+	///
+	/// - Parameters:
+	///   - rows: The number of rows for the grid.
+	///   - columns: The number of columns for the grid.
+	///   - suspectsNumber: The number of suspects to generate.
+	///   - colors: The number of available room colors to provide.
 	func setupGameWith(rows: Int, columns: Int, suspectsNumber: Int, colors: Int) {
 		resetTimer()
 		self.rows = rows
@@ -54,6 +89,9 @@ final class GridEngine {
 		generateSuspects(num: suspectsNumber)
 	}
 
+	/// Generates the game grid and selects the palette of room colors.
+	///
+	/// - Parameter num: The number of distinct colors to provide for the rooms.
 	private func generateGridAndColors(num: Int) {
 		guard rows > 0 && columns > 0 else { return }
 		var newCells: [[Cell]] = []
@@ -71,8 +109,11 @@ final class GridEngine {
 		self.roomColors = colors.prefix(upTo: num).map { $0.opacity(0.3) }
 	}
 	
+	/// Generates the list of suspects for the current game session.
+	///
+	/// - Parameter num: The number of suspects to create.
 	private func generateSuspects(num: Int) {
-		let names = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
+		let names = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "W", "X", "Y", "Z"]
 		guard num > 0 && num <= names.count else { return }
 		var suspectsList: [MurdokuObject] = []
 		
@@ -83,6 +124,10 @@ final class GridEngine {
 		self.suspects = suspectsList
 	}
 	
+	/// Processes a user intent to update the game state.
+	///
+	/// - Parameter intent: The `UserIntent` to be handled.
+	/// - Note: Move actions are wrapped in a spring animation for smoother UI transitions.
 	func handleIntent(_ intent: UserIntent) {
 		switch intent {
 		case .move(let package, let destRow, let destCol):
@@ -102,6 +147,9 @@ final class GridEngine {
 		}
 	}
 	
+	/// Processes a timer intent to control the game's clock.
+	///
+	/// - Parameter intent: The `TimerIntent` to be handled.
 	func handleTimer(_ intent: TimerIntent) {
 		switch intent {
 		case .start:
@@ -113,6 +161,14 @@ final class GridEngine {
 		}
 	}
 	
+	/// Validates whether a given object can be placed in a specific grid cell.
+	///
+	/// - Parameters:
+	///   - row: The target row index.
+	///   - col: The target column index.
+	///   - newObject: The object attempting to be placed.
+	/// - Returns: `true` if the placement is valid according to game rules; otherwise, `false`.
+	/// - Note: This checks for grid boundaries, cell occupancy (max 2 objects), and stacking rules for suspects.
 	func canPlaceObject(atRow row: Int, col: Int, newObject: MurdokuObject) -> Bool {
 		guard row >= 0 && row < rows && col >= 0 && col < columns else {
 			return false
@@ -137,6 +193,13 @@ final class GridEngine {
 		return false
 	}
 	
+	/// Executes the movement of an object to a new cell, updating suspects and board state.
+	///
+	/// - Parameters:
+	///   - package: The package containing the object and its origin.
+	///   - toRow: The destination row.
+	///   - col: The destination column.
+	/// - Note: If a suspect is moved, X-mark rules are applied across the row and column.
 	private func performMove(package: MurdokuTransferPackage, toRow: Int, col: Int) {
 		guard toRow >= 0 && toRow < rows && col >= 0 && col < columns else { return }
 		if package.object.element == .suspect {
@@ -154,6 +217,9 @@ final class GridEngine {
 		}
 	}
 	
+	/// Updates the placement status of a suspect based on their identifier.
+	///
+	/// - Parameter capitalLetter: The identifying letter of the suspect.
 	private func markSuspectAsPlaced(capitalLetter: String?) {
 		suspects = suspects.map { suspect in
 			guard suspect.capitalLetter == capitalLetter else { return suspect }
@@ -163,26 +229,45 @@ final class GridEngine {
 		}
 	}
 	
+	/// Handles the deletion of an object from the grid.
+	///
+	/// - Parameter package: The package containing the object to be deleted and its origin.
 	private func performDelete(package: MurdokuTransferPackage) {
 		clearCellAt(row: package.sourceRow, col: package.sourceCol, objectToRemove: package.object)
 	}
 	
+	/// Removes a specific object from a given grid cell.
+	///
+	/// - Parameters:
+	///   - row: The row index.
+	///   - col: The column index.
+	///   - objectToRemove: The object to be removed by ID.
 	private func clearCellAt(row: Int, col: Int, objectToRemove: MurdokuObject) {
 		guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
 		cells[row][col].elements.removeAll(where: { $0.id == objectToRemove.id })
 	}
 	
+	/// Clears all elements from a specific grid cell.
+	///
+	/// - Parameters:
+	///   - row: The row index.
+	///   - col: The column index.
 	private func clearCell(atRow row: Int, col: Int) {
 		guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
 		self.cells[row][col].elements = []
 	}
 	
+	/// Applies the X-mark (blockage) rules to the grid after a suspect is placed.
+	///
+	/// - Parameters:
+	///   - row: The row of the placement trigger.
+	///   - col: The column of the placement trigger.
+	/// - Note: All cells in the same row and column as the trigger are filled with X-marks, except the trigger cell itself.
 	private func applyXMarkRules(forRow row: Int, col: Int) {
 		let xMarkObject = MurdokuObject(name: "Bloqueo", element: .xMark)
 		
 		for r in 0..<rows {
 			for c in 0..<columns {
-				// No marcamos la celda donde está el sospechoso ni si es la misma posición.
 				if r == row || c == col {
 					guard r != row || c != col else { continue }
 					cells[r][c].elements.append(xMarkObject)
@@ -191,17 +276,25 @@ final class GridEngine {
 		}
 	}
 
+	/// Sets the background color of a specific grid cell.
+	///
+	/// - Parameters:
+	///   - newColor: The color to apply.
+	///   - row: The row index.
+	///   - col: The column index.
 	private func setRoomColor(_ newColor: Color, atRow row: Int, col: Int) {
 		guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
 		cells[row][col].color = newColor
 	}
 	
+	/// Starts the game timer if it is not already running.
 	private func startTimer() {
 		guard !isTimerRunning else { return }
 		isTimerRunning = true
 		timerStartDate = Date()
 	}
 
+	/// Pauses the game timer and persists the elapsed time.
 	private func pauseTimer() {
 		guard isTimerRunning else { return }
 		elapsedTime += Date().timeIntervalSince(timerStartDate ?? Date())
@@ -209,17 +302,20 @@ final class GridEngine {
 		timerStartDate = nil
 	}
 
+	/// Resets the game timer to zero.
 	private func resetTimer() {
 		elapsedTime = 0
 		isTimerRunning = false
 		timerStartDate = nil
 	}
 
+	/// The total elapsed time in seconds, including the current active session.
 	var elapsedSeconds: TimeInterval {
 		guard isTimerRunning, let timerStartDate else { return elapsedTime }
 		return elapsedTime + Date().timeIntervalSince(timerStartDate)
 	}
 
+	/// Resets the game engine to its initial empty state and clears the timer.
 	func resetGame() {
 		self.rows = 0
 		self.columns = 0
