@@ -180,4 +180,49 @@ struct GridEngineTests {
 		#expect(cellElements.contains { $0.element == .xMark })
 		#expect(cellElements.count == 2)
 	}
+	
+	@Test("allSuspectsPlaced debe ser false mientras no se hayan colocado todos los sospechosos")
+	func allSuspectsPlacedInitiallyFalse() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 2, colors: 1)
+		#expect(engine.allSuspectsPlaced == false)
+	}
+
+	@Test("allSuspectsPlaced debe ser true cuando se colocan todos los sospechosos")
+	func allSuspectsPlacedAfterPlacingAll() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 2, colors: 1)
+		
+		let suspectA = MurdokuObject(name: "Sospechoso A", element: .suspect, capitalLetter: "A")
+		engine.handleIntent(.move(package: MurdokuTransferPackage(object: suspectA, sourceRow: -1, sourceCol: -1), destinationRow: 0, destinationCol: 0))
+		
+		let suspectB = MurdokuObject(name: "Sospechoso B", element: .suspect, capitalLetter: "B")
+		engine.handleIntent(.move(package: MurdokuTransferPackage(object: suspectB, sourceRow: -1, sourceCol: -1), destinationRow: 1, destinationCol: 1))
+		
+		#expect(engine.allSuspectsPlaced == true)
+		#expect(engine.suspects.first { $0.capitalLetter == "A" }?.isPlaced == true)
+		#expect(engine.suspects.first { $0.capitalLetter == "B" }?.isPlaced == true)
+	}
+
+	@Test("Colocar la víctima debe detener el temporizador")
+	func victimPlacementStopsTimer() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 1, colors: 1)
+		engine.handleTimer(.start)
+		#expect(engine.isTimerRunning == true)
+		
+		let victim = MurdokuObject(name: "Víctima", element: .victim)
+		engine.handleIntent(.move(package: MurdokuTransferPackage(object: victim, sourceRow: -1, sourceCol: -1), destinationRow: 1, destinationCol: 1))
+		
+		#expect(engine.isTimerRunning == false)
+	}
+
+	@Test("Colocar un elemento que no sea la víctima no debe detener el temporizador")
+	func nonVictimPlacementKeepsTimerRunning() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0, colors: 1)
+		engine.handleTimer(.start)
+		#expect(engine.isTimerRunning == true)
+		
+		let chair = MurdokuObject(name: "Silla", element: .chair)
+		engine.handleIntent(.move(package: MurdokuTransferPackage(object: chair, sourceRow: -1, sourceCol: -1), destinationRow: 1, destinationCol: 1))
+		
+		#expect(engine.isTimerRunning == true)
+	}
 }
