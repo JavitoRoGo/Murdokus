@@ -64,7 +64,10 @@ struct ElementsView: View {
 					}
 				}
 				Divider()
-				SingleElementView(object: MurdokuObject(name: "Víctima", element: .victim))
+				HStack {
+					SingleElementView(object: MurdokuObject(name: "Casilla bloqueada", element: .xMark))
+					SingleElementView(object: MurdokuObject(name: "Víctima", element: .victim))
+				}
 			}
 		}
 		.frame(minWidth: 300)
