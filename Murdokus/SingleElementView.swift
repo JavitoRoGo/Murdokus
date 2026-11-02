@@ -31,7 +31,9 @@ struct SingleElementView: View {
 			Capsule()
 				.fill(.ultraThinMaterial)
 		}
+        .opacity(canDrag ? 1.0 : 0.3)
         .onDrag {
+			guard canDrag else { return NSItemProvider() }
 			engine.draggingObject = object
 			return NSItemProvider(object: MurdokuObjectProvider(object: object, row: -1, col: -1))
 		} preview: {
@@ -39,10 +41,24 @@ struct SingleElementView: View {
 				.resizable()
 				.frame(width: 75, height: 75)
 				.foregroundColor(.black.opacity(0.5))
+				.opacity(canDrag ? 1.0 : 0.3)
 				.padding(10)
 				.background(Circle().fill(.ultraThinMaterial))
 		}
     }
+	
+	/// Determina si el elemento puede arrastrarse desde el panel.
+	/// Los sospechosos ya colocados y la victima (mientras no se hayan colocado todos los sospechosos) estan desactivados.
+	var canDrag: Bool {
+		switch object.element {
+		case .victim:
+			return engine.allSuspectsPlaced
+		case .suspect:
+			return engine.suspects.first { $0.capitalLetter == object.capitalLetter }?.isPlaced != true
+		default:
+			return true
+		}
+	}
 }
 
 #Preview {
