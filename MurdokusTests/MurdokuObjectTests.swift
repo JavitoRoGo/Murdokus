@@ -8,9 +8,10 @@
 import Testing
 import Foundation
 import UniformTypeIdentifiers
+
 @testable import Murdokus
 
-@Suite("Pruebas de Serialización y Lógica de Negocio")
+@Suite("Pruebas de Serialización y Transferencia")
 struct MurdokuObjectTests {
 
 	@Test("Un objeto debe poder codificarse y decodificarse sin pérdida de datos")
@@ -19,7 +20,8 @@ struct MurdokuObjectTests {
 		let originalObject = MurdokuObject(
 			name: "Sospechoso X",
 			element: .suspect,
-			capitalLetter: "X"
+			capitalLetter: "X",
+			isPlaced: true
 		)
 		let encoder = JSONEncoder()
 		let decoder = JSONDecoder()
@@ -32,6 +34,7 @@ struct MurdokuObjectTests {
 		#expect(decodedObject.name == originalObject.name)
 		#expect(decodedObject.element == originalObject.element)
 		#expect(decodedObject.capitalLetter == originalObject.capitalLetter)
+		#expect(decodedObject.isPlaced == originalObject.isPlaced)
 	}
 
 	@Test("El identificador de UTType debe ser el correcto para evitar colisiones")
@@ -52,6 +55,7 @@ struct MurdokuObjectTests {
 		let decodedPackage = try decoder.decode(MurdokuTransferPackage.self, from: data)
 
 		#expect(decodedPackage.object.name == "Test")
+		#expect(decodedPackage.object.element == .chair)
 		#expect(decodedPackage.sourceRow == 1)
 		#expect(decodedPackage.sourceCol == 2)
 	}
