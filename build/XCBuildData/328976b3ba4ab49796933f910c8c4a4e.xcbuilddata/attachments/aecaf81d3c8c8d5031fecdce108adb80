@@ -1,0 +1,81 @@
+{
+  "" : {
+    "const-values" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/Murdokus-primary.swiftconstvalues",
+    "dependencies" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/Murdokus-primary.d",
+    "diagnostics" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/Murdokus-primary.dia",
+    "emit-module-dependencies" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/Murdokus-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/Murdokus-primary-emit-module.dia",
+    "pch" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/Murdokus-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/Murdokus-primary.swiftdeps"
+  },
+  "/Users/javirg/Developer/Murdokus/Murdokus/CellView.swift" : {
+    "index-unit-output-path" : "/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/CellView.o",
+    "llvm-bc" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/CellView.bc",
+    "object" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/CellView.o"
+  },
+  "/Users/javirg/Developer/Murdokus/Murdokus/ContentView.swift" : {
+    "index-unit-output-path" : "/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/ContentView.o",
+    "llvm-bc" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/ContentView.bc",
+    "object" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/ContentView.o"
+  },
+  "/Users/javirg/Developer/Murdokus/Murdokus/ElementsView.swift" : {
+    "index-unit-output-path" : "/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/ElementsView.o",
+    "llvm-bc" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/ElementsView.bc",
+    "object" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/ElementsView.o"
+  },
+  "/Users/javirg/Developer/Murdokus/Murdokus/GridEngine.swift" : {
+    "index-unit-output-path" : "/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/GridEngine.o",
+    "llvm-bc" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/GridEngine.bc",
+    "object" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/GridEngine.o"
+  },
+  "/Users/javirg/Developer/Murdokus/Murdokus/GridView.swift" : {
+    "index-unit-output-path" : "/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/GridView.o",
+    "llvm-bc" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/GridView.bc",
+    "object" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/GridView.o"
+  },
+  "/Users/javirg/Developer/Murdokus/Murdokus/Helpers.swift" : {
+    "index-unit-output-path" : "/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/Helpers.o",
+    "llvm-bc" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/Helpers.bc",
+    "object" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/Helpers.o"
+  },
+  "/Users/javirg/Developer/Murdokus/Murdokus/MurdokuModels.swift" : {
+    "index-unit-output-path" : "/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/MurdokuModels.o",
+    "llvm-bc" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/MurdokuModels.bc",
+    "object" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/MurdokuModels.o"
+  },
+  "/Users/javirg/Developer/Murdokus/Murdokus/MurdokuObjectProvider.swift" : {
+    "index-unit-output-path" : "/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/MurdokuObjectProvider.o",
+    "llvm-bc" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/MurdokuObjectProvider.bc",
+    "object" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/MurdokuObjectProvider.o"
+  },
+  "/Users/javirg/Developer/Murdokus/Murdokus/MurdokusApp.swift" : {
+    "index-unit-output-path" : "/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/MurdokusApp.o",
+    "llvm-bc" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/MurdokusApp.bc",
+    "object" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/MurdokusApp.o"
+  },
+  "/Users/javirg/Developer/Murdokus/Murdokus/RoomColorView.swift" : {
+    "index-unit-output-path" : "/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/RoomColorView.o",
+    "llvm-bc" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/RoomColorView.bc",
+    "object" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/RoomColorView.o"
+  },
+  "/Users/javirg/Developer/Murdokus/Murdokus/SidebarView.swift" : {
+    "index-unit-output-path" : "/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/SidebarView.o",
+    "llvm-bc" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/SidebarView.bc",
+    "object" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/SidebarView.o"
+  },
+  "/Users/javirg/Developer/Murdokus/Murdokus/SingleElementView.swift" : {
+    "index-unit-output-path" : "/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/SingleElementView.o",
+    "llvm-bc" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/SingleElementView.bc",
+    "object" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/SingleElementView.o"
+  },
+  "/Users/javirg/Developer/Murdokus/Murdokus/TrashView.swift" : {
+    "index-unit-output-path" : "/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/TrashView.o",
+    "llvm-bc" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/TrashView.bc",
+    "object" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/TrashView.o"
+  },
+  "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/GeneratedAssetSymbols.o"
+  }
+}

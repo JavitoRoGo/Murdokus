@@ -1,0 +1,80 @@
+{
+  "source": "/Users/javirg/Developer/Murdokus/Murdokus/SidebarView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Tablero",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 12
+        }
+      },
+      {
+        "comment": "",
+        "key": "Espacios",
+        "location": {
+          "startingColumn": 12,
+          "startingLine": 21
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sospechosos",
+        "location": {
+          "startingColumn": 12,
+          "startingLine": 27
+        }
+      },
+      {
+        "comment": "",
+        "key": "Filas: %lld",
+        "location": {
+          "startingColumn": 11,
+          "startingLine": 14
+        }
+      },
+      {
+        "comment": "",
+        "key": "Columnas: %lld",
+        "location": {
+          "startingColumn": 11,
+          "startingLine": 17
+        }
+      },
+      {
+        "comment": "",
+        "key": "Espacios: %lld",
+        "location": {
+          "startingColumn": 11,
+          "startingLine": 23
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sospechosos: %lld",
+        "location": {
+          "startingColumn": 11,
+          "startingLine": 29
+        }
+      },
+      {
+        "comment": "",
+        "key": "Configurar",
+        "location": {
+          "startingColumn": 12,
+          "startingLine": 36
+        }
+      },
+      {
+        "comment": "",
+        "key": "Borrar",
+        "location": {
+          "startingColumn": 12,
+          "startingLine": 41
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,16 @@
+{
+  "source": "/Users/javirg/Developer/Murdokus/Murdokus/TrashView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Arrastra aquí para borrar.\nToca para borrar la selección del color.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 27
+        }
+      }
+    ]
+  },
+  "version": 1
+}

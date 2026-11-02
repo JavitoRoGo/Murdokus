@@ -63,6 +63,8 @@ struct ElementsView: View {
 						SingleElementView(object: suspect)
 					}
 				}
+				Divider()
+				SingleElementView(object: MurdokuObject(name: "Víctima", element: .victim))
 			}
 		}
 		.frame(minWidth: 300)

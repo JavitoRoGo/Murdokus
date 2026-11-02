@@ -16,11 +16,6 @@ struct TimerView: View {
 				Text(Self.formattedElapsedSeconds(engine.elapsedSeconds))
 					.font(Font.system(size: 34).monospaced())
 			}
-			
-			Button("Detener") {
-				engine.handleTimer(.pause)
-			}
-			.buttonStyle(.borderedProminent)
 		}
 	}
 

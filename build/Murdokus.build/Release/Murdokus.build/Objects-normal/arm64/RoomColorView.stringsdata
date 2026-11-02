@@ -1,0 +1,16 @@
+{
+  "source": "/Users/javirg/Developer/Murdokus/Murdokus/RoomColorView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Espacio",
+        "location": {
+          "startingColumn": 9,
+          "startingLine": 17
+        }
+      }
+    ]
+  },
+  "version": 1
+}

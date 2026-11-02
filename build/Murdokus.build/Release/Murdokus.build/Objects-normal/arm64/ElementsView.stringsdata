@@ -1,0 +1,40 @@
+{
+  "source": "/Users/javirg/Developer/Murdokus/Murdokus/ElementsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Elige el número de espacios",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 20
+        }
+      },
+      {
+        "comment": "",
+        "key": "Espacios",
+        "location": {
+          "startingColumn": 11,
+          "startingLine": 29
+        }
+      },
+      {
+        "comment": "",
+        "key": "Elementos",
+        "location": {
+          "startingColumn": 12,
+          "startingLine": 43
+        }
+      },
+      {
+        "comment": "",
+        "key": "Comenzar",
+        "location": {
+          "startingColumn": 12,
+          "startingLine": 54
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -11,6 +11,7 @@ import UniformTypeIdentifiers
 /// Representa los tipos de objetos que pueden existir en el tablero.
 enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
 	case suspect = "Sospechoso"
+	case victim = "Víctima"
 	case xMark = "Casilla bloqueada"
 	case chair = "Silla"
 	case table = "Mesa"
@@ -25,6 +26,7 @@ enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
 	func icon(for suspect: String = "") -> String {
 		switch self {
 		case .suspect: "\(suspect.lowercased()).circle.fill"
+		case .victim: "person.fill.xmark"
 		case .xMark: "xmark"
 		case .chair: "chair.lounge"
 		case .table: "table.furniture"
@@ -47,7 +49,7 @@ enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
 	}
 	
 	static var elements: [MurdokuElement] {
-		self.allCases.filter { $0 != .suspect }
+		self.allCases.filter { $0 != .suspect && $0 != .victim }
 	}
 }
 
@@ -56,6 +58,7 @@ struct MurdokuObject: Identifiable, Codable, Transferable {
 	var name: String
 	var element: MurdokuElement
 	var capitalLetter: String? = nil
+	var isPlaced: Bool? = nil
 
 	static var transferRepresentation: CodableRepresentation<MurdokuObject, JSONEncoder, JSONDecoder> {
 		CodableRepresentation(contentType: .murdokuObject)

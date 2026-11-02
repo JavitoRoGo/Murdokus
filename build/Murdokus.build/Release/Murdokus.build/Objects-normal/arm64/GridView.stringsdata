@@ -1,0 +1,24 @@
+{
+  "source": "/Users/javirg/Developer/Murdokus/Murdokus/GridView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Elige el número de filas y columnas.",
+        "location": {
+          "startingColumn": 113,
+          "startingLine": 9
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tablero vacío",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 9
+        }
+      }
+    ]
+  },
+  "version": 1
+}

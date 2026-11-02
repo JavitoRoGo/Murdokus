@@ -17,6 +17,10 @@ final class GridEngine {
 	var roomColors: [Color] = []
 	var showingSuspects = false
 	
+	var allSuspectsPlaced: Bool {
+		suspects.allSatisfy { $0.isPlaced ?? false }
+	}
+	
 	var activePaintColor: Color? = nil
 	
 	var elapsedTime: TimeInterval = 0
@@ -32,7 +36,6 @@ final class GridEngine {
 		}
 	}()
 	
-	/// Define los tipos de acciones que un usuario puede intentar realizar en el tablero.
 	enum UserIntent {
 		case move(package: MurdokuTransferPackage, destinationRow: Int, destinationCol: Int)
 		case delete(package: MurdokuTransferPackage)
@@ -137,12 +140,26 @@ final class GridEngine {
 	private func performMove(package: MurdokuTransferPackage, toRow: Int, col: Int) {
 		guard toRow >= 0 && toRow < rows && col >= 0 && col < columns else { return }
 		if package.object.element == .suspect {
+			markSuspectAsPlaced(capitalLetter: package.object.capitalLetter)
 			applyXMarkRules(forRow: toRow, col: col)
 		}
 		cells[toRow][col].elements.append(package.object)
 		
 		if package.sourceRow != -1 && (package.sourceRow != toRow || package.sourceCol != col) {
 			clearCellAt(row: package.sourceRow, col: package.sourceCol, objectToRemove: package.object)
+		}
+		
+		if package.object.element == .victim {
+			pauseTimer()
+		}
+	}
+	
+	private func markSuspectAsPlaced(capitalLetter: String?) {
+		suspects = suspects.map { suspect in
+			guard suspect.capitalLetter == capitalLetter else { return suspect }
+			var placedSuspect = suspect
+			placedSuspect.isPlaced = true
+			return placedSuspect
 		}
 	}
 	

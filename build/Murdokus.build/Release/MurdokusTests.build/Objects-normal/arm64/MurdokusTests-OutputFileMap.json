@@ -1,0 +1,21 @@
+{
+  "" : {
+    "const-values" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/MurdokusTests.build/Objects-normal/arm64/MurdokusTests-primary.swiftconstvalues",
+    "dependencies" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/MurdokusTests.build/Objects-normal/arm64/MurdokusTests-primary.d",
+    "diagnostics" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/MurdokusTests.build/Objects-normal/arm64/MurdokusTests-primary.dia",
+    "emit-module-dependencies" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/MurdokusTests.build/Objects-normal/arm64/MurdokusTests-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/MurdokusTests.build/Objects-normal/arm64/MurdokusTests-primary-emit-module.dia",
+    "pch" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/MurdokusTests.build/Objects-normal/arm64/MurdokusTests-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/MurdokusTests.build/Objects-normal/arm64/MurdokusTests-primary.swiftdeps"
+  },
+  "/Users/javirg/Developer/Murdokus/MurdokusTests/GridEngineTests.swift" : {
+    "index-unit-output-path" : "/Murdokus.build/Release/MurdokusTests.build/Objects-normal/arm64/GridEngineTests.o",
+    "llvm-bc" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/MurdokusTests.build/Objects-normal/arm64/GridEngineTests.bc",
+    "object" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/MurdokusTests.build/Objects-normal/arm64/GridEngineTests.o"
+  },
+  "/Users/javirg/Developer/Murdokus/MurdokusTests/MurdokuObjectTests.swift" : {
+    "index-unit-output-path" : "/Murdokus.build/Release/MurdokusTests.build/Objects-normal/arm64/MurdokuObjectTests.o",
+    "llvm-bc" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/MurdokusTests.build/Objects-normal/arm64/MurdokuObjectTests.bc",
+    "object" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/MurdokusTests.build/Objects-normal/arm64/MurdokuObjectTests.o"
+  }
+}

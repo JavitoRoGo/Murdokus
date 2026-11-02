@@ -1,0 +1,4 @@
+Target dependency graph (2 targets)
+Target 'MurdokusTests' in project 'Murdokus'
+➜ Explicit dependency on target 'Murdokus' in project 'Murdokus'
+Target 'Murdokus' in project 'Murdokus' (no dependencies)

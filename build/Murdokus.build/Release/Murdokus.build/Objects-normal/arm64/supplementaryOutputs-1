@@ -1,0 +1,12 @@
+{
+  "/Users/javirg/Developer/Murdokus/Murdokus/CellView.swift" : {
+    "abi-baseline-json" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/Murdokus.abi.json",
+    "const-values" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/Murdokus-primary.swiftconstvalues",
+    "dependencies" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/Murdokus-primary.d",
+    "diagnostics" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/Murdokus-primary.dia",
+    "objc-header" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/Murdokus-Swift.h",
+    "swiftdoc" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/Murdokus.swiftdoc",
+    "swiftmodule" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/Murdokus.swiftmodule",
+    "swiftsourceinfo" : "/Users/javirg/Developer/Murdokus/build/Murdokus.build/Release/Murdokus.build/Objects-normal/arm64/Murdokus.swiftsourceinfo"
+  }
+}
