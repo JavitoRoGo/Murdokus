@@ -32,31 +32,24 @@ struct CellView: View {
                     .foregroundColor(.black.opacity(0.7))
             }
 		}
-//		.dropDestination(for: MurdokuTransferPackage.self) { incomingPackages, _ in
-//			guard let package = incomingPackages.first else { return false }
-//			engine.handleIntent(.move(package: package, destinationRow: row, destinationCol: col))
-//			return true
-//		} isTargeted: { targeted in
-//			if targeted {
-//				isTargeted = targeted
-//				
-//				if let dragging = engine.draggingObject {
-//					isValidTarget = engine.canPlaceObject(atRow: row, col: col, newObject: dragging)
-//				} else {
-//					isValidTarget = false
-//				}
-//			} else {
-//				isTargeted = false
-//				isValidTarget = false
-//			}
-//		}
-//		.dropDestination(for: MurdokuColorPackage.self) { incomingPackages, _ in
-//			guard let package = incomingPackages.first else { return false }
-//			let newColor = ColorHelper.composeColor(red: package.red, green: package.green, blue: package.blue, opacity: package.opacity)
-//			engine.handleIntent(.changeColor(color: newColor, row: row, col: col))
-//			return true
-//		}
-		.onDrop(of: [UTType.murdokuObject], delegate: CellDropDelegate(row: row, col: col, engine: engine, isTargeted: $isTargeted, isValidTarget: $isValidTarget))
+		.dropDestination(for: MurdokuTransferPackage.self) { incomingPackages, _ in
+			guard let package = incomingPackages.first else { return false }
+			engine.handleIntent(.move(package: package, destinationRow: row, destinationCol: col))
+			return true
+		} isTargeted: { targeted in
+			if targeted {
+				isTargeted = targeted
+				
+				if let dragging = engine.draggingObject {
+					isValidTarget = engine.canPlaceObject(atRow: row, col: col, newObject: dragging)
+				} else {
+					isValidTarget = false
+				}
+			} else {
+				isTargeted = false
+				isValidTarget = false
+			}
+		}
         .onDrag {
             if let topObject = cell.elements.last {
 				engine.draggingObject = topObject
@@ -96,50 +89,4 @@ struct CellView: View {
             Color.clear
         }
     }
-}
-
-struct CellDropDelegate: DropDelegate {
-	let row: Int
-	let col: Int
-	let engine: GridEngine
-	@Binding var isTargeted: Bool
-	@Binding var isValidTarget: Bool
-	
-	func dropEntered(info: DropInfo) {
-		isTargeted = true
-		
-		if let dragging = engine.draggingObject {
-			isValidTarget = engine.canPlaceObject(atRow: row, col: col, newObject: dragging)
-		} else {
-			isValidTarget = false
-		}
-	}
-	
-	func dropExited(info: DropInfo) {
-		isTargeted = false
-		isValidTarget = false
-	}
-	
-	func validateDrop(info: DropInfo) -> DropProposal? {
-		if info.hasItemsConforming(to: [UTType.murdokuObject]) {
-			return DropProposal(operation: .move)
-		}
-		return nil
-	}
-	
-	func performDrop(info: DropInfo) -> Bool {
-		if let provider = info.itemProviders(for: [UTType.murdokuObject]).first {
-			provider.loadDataRepresentation(forTypeIdentifier: UTType.murdokuObject.identifier) { data, error in
-				guard let data = data, error == nil else { return }
-				Task { @MainActor in
-					let decoder = JSONDecoder()
-					if let package = try? decoder.decode(MurdokuTransferPackage.self, from: data) {
-						engine.handleIntent(.move(package: package, destinationRow: row, destinationCol: col))
-					}
-				}
-			}
-		}
-		
-		return true
-	}
 }

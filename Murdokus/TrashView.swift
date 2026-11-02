@@ -17,7 +17,11 @@ struct TrashView: View {
                 
                 Color.clear
                     .contentShape(Rectangle())
-                    .onDrop(of: [UTType.murdokuObject], delegate: TrashDropDelegate(engine: engine))
+					.dropDestination(for: MurdokuTransferPackage.self) { incomingPackages, _ in
+						guard let package = incomingPackages.first else { return false }
+						engine.handleIntent(.delete(package: package))
+						return true
+					}
             }
 			.frame(width: 80, height: 80)
 			.onTapGesture {
@@ -36,30 +40,4 @@ struct TrashView: View {
 #Preview {
 	TrashView()
 		.environment(GridEngine())
-}
-
-struct TrashDropDelegate: DropDelegate {
-	let engine: GridEngine
-	
-	func performDrop(info: DropInfo) -> Bool {
-		guard let itemProvider = info.itemProviders(for: [UTType.murdokuObject]).first else {
-			return false
-		}
-		
-		itemProvider.loadDataRepresentation(forTypeIdentifier: UTType.murdokuObject.identifier) { data, error in
-			guard let data = data, error == nil else { return }
-			
-			Task { @MainActor in
-				let decoder = JSONDecoder()
-				if let package = try? decoder.decode(MurdokuTransferPackage.self, from: data) {
-					engine.handleIntent(.delete(package: package))
-				}
-			}
-		}
-		return true
-	}
-	
-	func validateDrop(info: DropInfo) -> DropProposal? {
-		return DropProposal(operation: .move)
-	}
 }
