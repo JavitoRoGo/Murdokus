@@ -32,6 +32,11 @@ struct SingleElementView: View {
 				.fill(.ultraThinMaterial)
 		}
         .opacity(canDrag ? 1.0 : 0.3)
+        .onTapGesture {
+            guard object.element == .suspect else { return }
+            guard object.isPlaced != true else { return }
+            engine.handleIntent(.selectSuspect(capitalLetter: object.capitalLetter ?? ""))
+        }
         .onDrag {
 			guard canDrag else { return NSItemProvider() }
 			engine.draggingObject = object

@@ -36,8 +36,13 @@ struct GridView: View {
     }
 
     private func applyColorToCell(row: Int, col: Int) {
+        if engine.selectedSuspect != nil {
+            engine.handleIntent(.toggleSuspectCandidate(row: row, col: col))
+            return
+        }
+
         guard let activeColor = engine.activePaintColor else { return }
-        
+
         engine.handleIntent(.changeColor(color: activeColor, row: row, col: col))
     }
 }

@@ -48,6 +48,7 @@ struct ElementsView: View {
 					
 					Button() {
 						withAnimation {
+							engine.activePaintColor = nil
 							engine.handleTimer(.start)
 							engine.showingSuspects = true
 						}

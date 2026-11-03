@@ -13,7 +13,7 @@ struct CellView: View {
 	let row: Int
 	let col: Int
 	@Environment(GridEngine.self) private var engine
-	
+
 	@State private var isTargeted: Bool = false
 	@State private var isValidTarget: Bool = false
 
@@ -31,6 +31,10 @@ struct CellView: View {
                     .frame(width: 65, height: 65)
                     .foregroundColor(.black.opacity(0.7))
             }
+
+            if !candidateLetters.isEmpty {
+				candidateMarker
+			}
 		}
 		.dropDestination(for: MurdokuTransferPackage.self) { incomingPackages, _ in
 			guard let package = incomingPackages.first else { return false }
@@ -39,7 +43,7 @@ struct CellView: View {
 		} isTargeted: { targeted in
 			if targeted {
 				isTargeted = targeted
-				
+
 				if let dragging = engine.draggingObject {
 					isValidTarget = engine.canPlaceObject(atRow: row, col: col, newObject: dragging)
 				} else {
@@ -55,7 +59,7 @@ struct CellView: View {
 				engine.draggingObject = topObject
                 return NSItemProvider(object: MurdokuObjectProvider(object: topObject, row: row, col: col))
             } else {
-				return NSItemProvider()
+                return NSItemProvider()
             }
         } preview: {
             if let topObject = cell.elements.last {
@@ -70,23 +74,43 @@ struct CellView: View {
             }
         }
 	}
-    
-    @ViewBuilder
-    private var hoverBackground: some View {
+
+	@ViewBuilder
+	private var hoverBackground: some View {
 		if isTargeted && engine.draggingObject?.element == .suspect {
 			Color(isValidTarget ? .green : .red).opacity(0.2)
-        } else {
-            Color.clear
-        }
-    }
-    
-    @ViewBuilder
-    private var hoverOverlay: some View {
+		} else {
+			Color.clear
+		}
+	}
+
+	@ViewBuilder
+	private var hoverOverlay: some View {
 		if isTargeted && engine.draggingObject?.element == .suspect {
-            Rectangle()
-                .stroke(isValidTarget ? Color.green : Color.red, lineWidth: 3)
-        } else {
-            Color.clear
-        }
-    }
+			Rectangle()
+				.stroke(isValidTarget ? Color.green : Color.red, lineWidth: 3)
+		} else {
+			Color.clear
+		}
+	}
+
+	/// The candidate markers of the current cell, rendered as an array of letters.
+	private var candidateLetters: [String] {
+		engine.suspectCandidates
+			.filter { _, positions in positions.contains(CellKey(row: row, col: col)) }
+			.map { $0.key }
+			.sorted()
+	}
+
+	/// The candidate marker of the current cell, rendered in the top-leading corner.
+	private var candidateMarker: some View {
+		HStack {
+			ForEach(candidateLetters, id: \.self) { letter in
+				Text(letter)
+					.font(.system(size: 14, weight: .bold))
+					.foregroundColor(.primary)
+					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+			}
+		}
+	}
 }

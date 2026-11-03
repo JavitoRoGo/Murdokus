@@ -26,8 +26,8 @@ final class GridEngine {
 	var draggingObject: MurdokuObject? = nil
 	/// The capital letter of the suspect currently selected for placement, if any.
 	var selectedSuspect: String? = nil
-	/// The pending placement candidates for the currently selected suspect.
-	var suspectCandidates: Set<CellKey> = []
+	/// The pending placement candidates, keyed by the capital letter of the suspect.
+	var suspectCandidates: [String: Set<CellKey>] = [:]
 	/// The set of available colors used to paint the rooms in the grid.
 	var roomColors: [Color] = []
 	/// Controls whether the suspect list is visible in the user interface.
@@ -92,7 +92,7 @@ final class GridEngine {
 	func setupGameWith(rows: Int, columns: Int, suspectsNumber: Int, colors: Int) {
 		resetTimer()
 		self.selectedSuspect = nil
-		self.suspectCandidates = []
+		self.suspectCandidates = [:]
 		self.rows = rows
 		self.columns = columns
 		generateGridAndColors(num: colors)
@@ -156,10 +156,9 @@ final class GridEngine {
 			setRoomColor(color, atRow: row, col: col)
 		case .selectSuspect(let capitalLetter):
 			selectedSuspect = capitalLetter
-			suspectCandidates = []
 		case .toggleSuspectCandidate(let row, let col):
-			guard selectedSuspect != nil else { return }
-			toggleCandidate(atRow: row, col: col)
+			guard let capitalLetter = selectedSuspect else { return }
+			toggleCandidate(atRow: row, col: col, capitalLetter: capitalLetter)
 		}
 	}
 	
@@ -177,17 +176,26 @@ final class GridEngine {
 		}
 	}
 	
-	/// Toggles the candidate marker at the given grid position for the selected suspect.
-	private func toggleCandidate(atRow row: Int, col: Int) {
+	/// Toggles the candidate marker at the given grid position for the given suspect.
+	private func toggleCandidate(atRow row: Int, col: Int, capitalLetter: String) {
 		let key = CellKey(row: row, col: col)
-		if suspectCandidates.contains(key) {
-			suspectCandidates.remove(key)
+		let positions = suspectCandidates[capitalLetter] ?? Set<CellKey>()
+		if positions.contains(key) {
+			suspectCandidates[capitalLetter] = Set(positions.filter { $0 != key })
 			return
 		}
-		guard let capitalLetter = selectedSuspect else { return }
 		let suspect = MurdokuObject(name: "Sospechoso \(capitalLetter)", element: .suspect, capitalLetter: capitalLetter)
 		if canPlaceObject(atRow: row, col: col, newObject: suspect) {
-			suspectCandidates.insert(key)
+			suspectCandidates[capitalLetter] = positions.union([key])
+		}
+	}
+	
+	/// Clears the candidate marker at the given grid position, across all suspects.
+	private func clearCandidate(atRow row: Int, col: Int) {
+		let key = CellKey(row: row, col: col)
+		let letters = suspectCandidates.filter { _, positions in positions.contains(key) }.map { $0.key }
+		for letter in letters {
+			suspectCandidates[letter] = Set((suspectCandidates[letter] ?? Set<CellKey>()).filter { $0 != key })
 		}
 	}
 	
@@ -235,9 +243,13 @@ final class GridEngine {
 		if package.object.element == .suspect {
 			markSuspectAsPlaced(capitalLetter: package.object.capitalLetter)
 			applyXMarkRules(forRow: toRow, col: col)
+			if let letter = package.object.capitalLetter {
+				suspectCandidates[letter] = Set<CellKey>()
+			}
+			selectedSuspect = nil
 		}
 		cells[toRow][col].elements.append(package.object)
-		suspectCandidates.remove(CellKey(row: toRow, col: col))
+		clearCandidate(atRow: toRow, col: col)
 		
 		if package.sourceRow != -1 && (package.sourceRow != toRow || package.sourceCol != col) {
 			clearCellAt(row: package.sourceRow, col: package.sourceCol, objectToRemove: package.object)
@@ -302,7 +314,7 @@ final class GridEngine {
 				if r == row || c == col {
 					guard r != row || c != col else { continue }
 					cells[r][c].elements.append(xMarkObject)
-					suspectCandidates.remove(CellKey(row: r, col: c))
+					clearCandidate(atRow: r, col: c)
 				}
 			}
 		}
@@ -355,7 +367,7 @@ final class GridEngine {
 		self.cells = []
 		self.roomColors = []
 		self.selectedSuspect = nil
-		self.suspectCandidates = []
+		self.suspectCandidates = [:]
 		resetTimer()
 	}
 }
