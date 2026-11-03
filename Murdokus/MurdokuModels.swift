@@ -127,6 +127,14 @@ struct MurdokuTransferPackage: Codable, Transferable {
 	}
 }
 
+/// A key that identifies a position within the game grid.
+struct CellKey: Hashable {
+	/// The row index of the cell.
+	let row: Int
+	/// The column index of the cell.
+	let col: Int
+}
+
 /// A grid cell that holds a collection of placed elements and its color.
 struct Cell {
 	/// The elements currently placed in the cell.

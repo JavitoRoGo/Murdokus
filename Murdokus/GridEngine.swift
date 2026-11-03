@@ -24,6 +24,10 @@ final class GridEngine {
 	var suspects: [MurdokuObject] = []
 	/// The object currently being dragged across the grid, if any.
 	var draggingObject: MurdokuObject? = nil
+	/// The capital letter of the suspect currently selected for placement, if any.
+	var selectedSuspect: String? = nil
+	/// The pending placement candidates for the currently selected suspect.
+	var suspectCandidates: Set<CellKey> = []
 	/// The set of available colors used to paint the rooms in the grid.
 	var roomColors: [Color] = []
 	/// Controls whether the suspect list is visible in the user interface.
@@ -62,6 +66,10 @@ final class GridEngine {
 		case delete(package: MurdokuTransferPackage)
 		/// Changes the background color of a specific cell.
 		case changeColor(color: Color, row: Int, col: Int)
+		/// Selects a suspect for placement, or clears the selection if nil.
+		case selectSuspect(capitalLetter: String?)
+		/// Toggles the candidate marker of a suspect at the given grid position.
+		case toggleSuspectCandidate(row: Int, col: Int)
 	}
 	
 	/// Represents an action that modifies the state of the game timer.
@@ -83,6 +91,8 @@ final class GridEngine {
 	///   - colors: The number of available room colors to provide.
 	func setupGameWith(rows: Int, columns: Int, suspectsNumber: Int, colors: Int) {
 		resetTimer()
+		self.selectedSuspect = nil
+		self.suspectCandidates = []
 		self.rows = rows
 		self.columns = columns
 		generateGridAndColors(num: colors)
@@ -144,6 +154,12 @@ final class GridEngine {
 			self.draggingObject = nil
 		case .changeColor(let color, let row, let col):
 			setRoomColor(color, atRow: row, col: col)
+		case .selectSuspect(let capitalLetter):
+			selectedSuspect = capitalLetter
+			suspectCandidates = []
+		case .toggleSuspectCandidate(let row, let col):
+			guard selectedSuspect != nil else { return }
+			toggleCandidate(atRow: row, col: col)
 		}
 	}
 	
@@ -158,6 +174,20 @@ final class GridEngine {
 			pauseTimer()
 		case .reset:
 			resetTimer()
+		}
+	}
+	
+	/// Toggles the candidate marker at the given grid position for the selected suspect.
+	private func toggleCandidate(atRow row: Int, col: Int) {
+		let key = CellKey(row: row, col: col)
+		if suspectCandidates.contains(key) {
+			suspectCandidates.remove(key)
+			return
+		}
+		guard let capitalLetter = selectedSuspect else { return }
+		let suspect = MurdokuObject(name: "Sospechoso \(capitalLetter)", element: .suspect, capitalLetter: capitalLetter)
+		if canPlaceObject(atRow: row, col: col, newObject: suspect) {
+			suspectCandidates.insert(key)
 		}
 	}
 	
@@ -207,6 +237,7 @@ final class GridEngine {
 			applyXMarkRules(forRow: toRow, col: col)
 		}
 		cells[toRow][col].elements.append(package.object)
+		suspectCandidates.remove(CellKey(row: toRow, col: col))
 		
 		if package.sourceRow != -1 && (package.sourceRow != toRow || package.sourceCol != col) {
 			clearCellAt(row: package.sourceRow, col: package.sourceCol, objectToRemove: package.object)
@@ -271,6 +302,7 @@ final class GridEngine {
 				if r == row || c == col {
 					guard r != row || c != col else { continue }
 					cells[r][c].elements.append(xMarkObject)
+					suspectCandidates.remove(CellKey(row: r, col: c))
 				}
 			}
 		}
@@ -322,6 +354,8 @@ final class GridEngine {
 		self.suspects = []
 		self.cells = []
 		self.roomColors = []
+		self.selectedSuspect = nil
+		self.suspectCandidates = []
 		resetTimer()
 	}
 }
