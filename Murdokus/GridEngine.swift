@@ -28,22 +28,24 @@ final class GridEngine {
 	var selectedSuspect: String? = nil
 	/// The pending placement candidates, keyed by the capital letter of the suspect.
 	var suspectCandidates: [String: Set<CellKey>] = [:]
-	/// The set of available colors used to paint the rooms in the grid.
+	/// The list of available colors used to paint the rooms in the grid.
 	var roomColors: [Color] = []
 	/// Controls whether the suspect list is visible in the user interface.
 	var showingSuspects = false
 	
-	/// A boolean indicating whether all suspects have been placed on the grid.
+	/// A Boolean value indicating whether all suspects have been placed on the grid.
+	///
+	/// - Returns: `true` if all suspects have been placed; otherwise, `false`.
 	var allSuspectsPlaced: Bool {
 		suspects.allSatisfy { $0.isPlaced ?? false }
 	}
 	
-	/// The current color selected for painting cells.
+	/// The color currently selected for painting cells, if any.
 	var activePaintColor: Color? = nil
 	
-	/// Total time elapsed in seconds, excluding the current active timer session.
+	/// The total time elapsed in seconds, excluding the current active timer session.
 	var elapsedTime: TimeInterval = 0
-	/// Indicates whether the game timer is currently counting up.
+	/// A Boolean value indicating whether the game timer is currently running.
 	var isTimerRunning = false
 	/// The timestamp when the current timer session started.
 	var timerStartDate: Date?
@@ -177,6 +179,11 @@ final class GridEngine {
 	}
 	
 	/// Toggles the candidate marker at the given grid position for the given suspect.
+	///
+	/// - Parameters:
+	///   - row: The row index of the grid position.
+	///   - col: The column index of the grid position.
+	///   - capitalLetter: The capital letter of the suspect.
 	private func toggleCandidate(atRow row: Int, col: Int, capitalLetter: String) {
 		let key = CellKey(row: row, col: col)
 		let positions = suspectCandidates[capitalLetter] ?? Set<CellKey>()
@@ -191,6 +198,10 @@ final class GridEngine {
 	}
 	
 	/// Clears the candidate marker at the given grid position, across all suspects.
+	///
+	/// - Parameters:
+	///   - row: The row index of the grid position.
+	///   - col: The column index of the grid position.
 	private func clearCandidate(atRow row: Int, col: Int) {
 		let key = CellKey(row: row, col: col)
 		let letters = suspectCandidates.filter { _, positions in positions.contains(key) }.map { $0.key }
@@ -354,6 +365,8 @@ final class GridEngine {
 	}
 
 	/// The total elapsed time in seconds, including the current active session.
+	///
+	/// - Returns: The elapsed time in seconds, including the time from the current timer session.
 	var elapsedSeconds: TimeInterval {
 		guard isTimerRunning, let timerStartDate else { return elapsedTime }
 		return elapsedTime + Date().timeIntervalSince(timerStartDate)
