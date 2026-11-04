@@ -59,6 +59,9 @@ struct ElementsView: View {
 					.buttonStyle(.borderedProminent)
 				}
 			} else {
+				Text("Pulsa sobre un sospechoso para marcar su ubicación posible.\nArrástralo para ponerlo en su ubicación definitiva.")
+					.multilineTextAlignment(.center)
+					.font(.subheadline)
 				LazyVGrid(columns: columns) {
 					ForEach(engine.suspects) { suspect in
 						SingleElementView(object: suspect)

@@ -225,4 +225,107 @@ struct GridEngineTests {
 		
 		#expect(engine.isTimerRunning == true)
 	}
+
+	@Test("Seleccionar un sospechoso debe almacenar la letra elegida")
+	func selectSuspectStoresSelection() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 2, colors: 1)
+
+		engine.handleIntent(.selectSuspect(capitalLetter: "A"))
+
+		#expect(engine.selectedSuspect == "A")
+	}
+
+	@Test("El toggle de un candidato válido debe añadir la posición a los candidatos del sospechoso")
+	func toggleSuspectCandidateAddsValidPosition() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 2, colors: 1)
+		engine.handleIntent(.selectSuspect(capitalLetter: "A"))
+
+		engine.handleIntent(.toggleSuspectCandidate(row: 1, col: 1))
+
+		#expect(engine.suspectCandidates["A"]?.contains(CellKey(row: 1, col: 1)) == true)
+	}
+
+	@Test("El toggle de un candidato ya marcado debe eliminarlo")
+	func toggleSuspectCandidateRemovesMarkedPosition() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 2, colors: 1)
+		engine.handleIntent(.selectSuspect(capitalLetter: "A"))
+
+		engine.handleIntent(.toggleSuspectCandidate(row: 1, col: 1))
+		engine.handleIntent(.toggleSuspectCandidate(row: 1, col: 1))
+
+		#expect(engine.suspectCandidates["A"]?.contains(CellKey(row: 1, col: 1)) != true)
+	}
+
+	@Test("El toggle de un candidato en una celda ocupada no debe añadirse")
+	func toggleSuspectCandidateIgnoresOccupiedCell() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 2, colors: 1)
+
+		let suspectA = MurdokuObject(name: "Sospechoso A", element: .suspect, capitalLetter: "A")
+		let packageA = MurdokuTransferPackage(object: suspectA, sourceRow: -1, sourceCol: -1)
+		engine.handleIntent(.move(package: packageA, destinationRow: 1, destinationCol: 1))
+
+		engine.handleIntent(.selectSuspect(capitalLetter: "B"))
+		engine.handleIntent(.toggleSuspectCandidate(row: 1, col: 1))
+
+		#expect(engine.suspectCandidates["B"] == nil)
+	}
+
+	@Test("Colocar un sospechoso debe limpiar sus candidatos y la selección actual")
+	func placingSuspectClearsCandidatesAndSelection() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 2, colors: 1)
+
+		engine.handleIntent(.selectSuspect(capitalLetter: "A"))
+		engine.handleIntent(.toggleSuspectCandidate(row: 0, col: 0))
+		#expect(engine.suspectCandidates["A"]?.contains(CellKey(row: 0, col: 0)) == true)
+
+		let suspectA = MurdokuObject(name: "Sospechoso A", element: .suspect, capitalLetter: "A")
+		let package = MurdokuTransferPackage(object: suspectA, sourceRow: -1, sourceCol: -1)
+		engine.handleIntent(.move(package: package, destinationRow: 2, destinationCol: 2))
+
+		#expect(engine.suspectCandidates["A"]?.isEmpty == true)
+		#expect(engine.selectedSuspect == nil)
+		#expect(engine.suspects.first { $0.capitalLetter == "A" }?.isPlaced == true)
+	}
+
+	@Test("Colocar una marca X debe limpiar el candidato en la celda de destino")
+	func placingXMarkClearsCandidate() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 2, colors: 1)
+
+		engine.handleIntent(.selectSuspect(capitalLetter: "A"))
+		engine.handleIntent(.toggleSuspectCandidate(row: 1, col: 1))
+		#expect(engine.suspectCandidates["A"]?.contains(CellKey(row: 1, col: 1)) == true)
+
+		let xMark = MurdokuObject(name: "Bloqueo", element: .xMark)
+		let package = MurdokuTransferPackage(object: xMark, sourceRow: -1, sourceCol: -1)
+		engine.handleIntent(.move(package: package, destinationRow: 1, destinationCol: 1))
+
+		#expect(engine.suspectCandidates["A"]?.contains(CellKey(row: 1, col: 1)) != true)
+	}
+
+	@Test("Cambiar de sospechoso no debe borrar los candidatos del anterior")
+	func switchingSuspectKeepsPreviousCandidates() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 2, colors: 1)
+
+		engine.handleIntent(.selectSuspect(capitalLetter: "A"))
+		engine.handleIntent(.toggleSuspectCandidate(row: 0, col: 0))
+		engine.handleIntent(.selectSuspect(capitalLetter: "B"))
+
+		#expect(engine.suspectCandidates["A"]?.contains(CellKey(row: 0, col: 0)) == true)
+		#expect(engine.suspectCandidates["B"] == nil)
+	}
+
+	@Test("resetGame debe limpiar los candidatos de sospechosos")
+	func resetGameClearsSuspectCandidates() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 2, colors: 1)
+
+		engine.handleIntent(.selectSuspect(capitalLetter: "A"))
+		engine.handleIntent(.toggleSuspectCandidate(row: 0, col: 0))
+		engine.handleIntent(.selectSuspect(capitalLetter: "B"))
+		engine.handleIntent(.toggleSuspectCandidate(row: 2, col: 2))
+
+		engine.resetGame()
+
+		#expect(engine.suspectCandidates.isEmpty)
+		#expect(engine.selectedSuspect == nil)
+	}
 }
