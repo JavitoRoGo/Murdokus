@@ -29,9 +29,10 @@ struct SingleElementView: View {
 		.padding(10)
 		.background {
 			Capsule()
-				.fill(.ultraThinMaterial)
+				.fill(isSelected ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(.ultraThinMaterial))
 		}
         .opacity(canDrag ? 1.0 : 0.3)
+        .scaleEffect(isSelected ? 1.1 : 1.0)
         .onTapGesture {
             guard object.element == .suspect else { return }
             guard object.isPlaced != true else { return }
@@ -52,6 +53,11 @@ struct SingleElementView: View {
 		}
     }
 	
+	/// Whether this element is the suspect currently selected for candidate placement.
+	private var isSelected: Bool {
+		object.element == .suspect && engine.selectedSuspect == object.capitalLetter
+	}
+
 	var canDrag: Bool {
 		switch object.element {
 		case .victim:

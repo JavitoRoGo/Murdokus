@@ -102,15 +102,42 @@ struct CellView: View {
 			.sorted()
 	}
 
-	/// The candidate marker of the current cell, rendered in the top-leading corner.
-	private var candidateMarker: some View {
-		HStack {
-			ForEach(candidateLetters, id: \.self) { letter in
-				Text(letter)
-					.font(.system(size: 14, weight: .bold))
-					.foregroundColor(.primary)
-					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+	/// The maximum number of candidate letters rendered in a single row.
+	private let maximumCandidateRowCount = 3
+
+	/// Groups the candidate letters of the current cell into rows of at most `maximumCandidateRowCount` letters.
+	private var candidateRows: [[String]] {
+		var rows: [[String]] = []
+		var currentRow: [String] = []
+
+		for letter in candidateLetters {
+			currentRow.append(letter)
+			if currentRow.count >= maximumCandidateRowCount {
+				rows.append(currentRow)
+				currentRow = []
 			}
 		}
+
+		if !currentRow.isEmpty {
+			rows.append(currentRow)
+		}
+
+		return rows
+	}
+
+	/// The candidate marker of the current cell, rendered in the top-leading corner.
+	private var candidateMarker: some View {
+		VStack(alignment: .leading, spacing: 10) {
+			ForEach(candidateRows, id: \.self) { row in
+				HStack(spacing: 10) {
+					ForEach(row, id: \.self) { letter in
+						Text(letter)
+							.font(.system(size: 14, weight: .bold))
+							.foregroundColor(.primary)
+					}
+				}
+			}
+		}
+		.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 	}
 }
