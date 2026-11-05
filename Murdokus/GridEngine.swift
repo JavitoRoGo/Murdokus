@@ -49,6 +49,12 @@ final class GridEngine {
 	var isTimerRunning = false
 	/// The timestamp when the current timer session started.
 	var timerStartDate: Date?
+	/// The identifier of the saved game associated with the current session, if any.
+	var savedGameID: UUID? = nil
+	/// Indicates whether the current game session has been solved.
+	var isSolved: Bool = false
+	/// The time in seconds it took to solve the current game session, if solved.
+	var solvedTime: TimeInterval? = nil
 	
 	/// A static list of all available game objects derived from `MurdokuElement`.
 	let objects: [MurdokuObject] = {
@@ -99,6 +105,9 @@ final class GridEngine {
 		self.columns = columns
 		generateGridAndColors(num: colors)
 		generateSuspects(num: suspectsNumber)
+		self.savedGameID = nil
+		self.isSolved = false
+		self.solvedTime = nil
 	}
 
 	/// Generates the game grid and selects the palette of room colors.
@@ -268,6 +277,8 @@ final class GridEngine {
 		
 		if package.object.element == .victim {
 			pauseTimer()
+			isSolved = true
+			solvedTime = elapsedTime
 		}
 	}
 	
@@ -382,5 +393,28 @@ final class GridEngine {
 		self.selectedSuspect = nil
 		self.suspectCandidates = [:]
 		resetTimer()
+		self.savedGameID = nil
+		self.isSolved = false
+		self.solvedTime = nil
+	}
+	
+	/// Loads a saved game snapshot into the engine, preparing a new game session.
+	///
+	/// - Parameters:
+	///   - snapshot: The snapshot of the saved game to load.
+	///   - solveTime: The solve time associated with the saved game, if any.
+	func loadSavedGame(_ snapshot: SavedGameSnapshot, solveTime: TimeInterval? = nil) {
+		setupGameWith(rows: snapshot.rows, columns: snapshot.columns, suspectsNumber: snapshot.suspectsNumber, colors: snapshot.colors)
+
+		for row in 0..<snapshot.rows {
+			for col in 0..<snapshot.columns {
+				let savedCell = snapshot.cells[row][col]
+				cells[row][col].elements = savedCell.elements
+				cells[row][col].color = ColorHelper.composeColor(red: savedCell.color.red, green: savedCell.color.green, blue: savedCell.color.blue, opacity: savedCell.color.opacity)
+			}
+		}
+
+		self.isSolved = false
+		self.solvedTime = solveTime
 	}
 }

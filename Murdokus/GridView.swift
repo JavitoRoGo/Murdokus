@@ -2,6 +2,7 @@ import SwiftUI
 
 struct GridView: View {
     @Environment(GridEngine.self) private var engine
+    @Environment(SavedGamesStore.self) private var savedGamesStore
 
     var body: some View {
         VStack {
@@ -9,7 +10,15 @@ struct GridView: View {
 				if engine.rows == 0 || engine.columns == 0 {
 					ContentUnavailableView("Tablero vacío", systemImage: "square.grid.3x3.fill", description: Text("Elige el número de filas y columnas."))
 				} else {
-					TimerView()
+					VStack(spacing: 16) {
+						if engine.isSolved {
+							Button("Guardar tiempo") {
+								saveTime()
+							}
+							.buttonStyle(.bordered)
+						}
+						TimerView()
+					}
 					Divider()
 					HStack(spacing: 20) {
 						VStack(spacing: 0) {
@@ -44,6 +53,12 @@ struct GridView: View {
         guard let activeColor = engine.activePaintColor else { return }
 
         engine.handleIntent(.changeColor(color: activeColor, row: row, col: col))
+    }
+
+    private func saveTime() {
+        guard let savedGameID = engine.savedGameID,
+              let game = savedGamesStore.games.first(where: { $0.id == savedGameID }) else { return }
+        try? savedGamesStore.updateSolveTime(of: game, solveTime: engine.solvedTime ?? engine.elapsedTime)
     }
 }
 

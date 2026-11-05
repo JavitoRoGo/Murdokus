@@ -59,4 +59,32 @@ struct MurdokuObjectTests {
 		#expect(decodedPackage.sourceRow == 1)
 		#expect(decodedPackage.sourceCol == 2)
 	}
+
+	@Test("El snapshot de partida debe codificarse y decodificarse sin pérdida de datos")
+	func savedGameSnapshotCodable() throws {
+		let cell = SavedGameCell(
+			elements: [MurdokuObject(name: "Sospechoso A", element: .suspect, capitalLetter: "A", isPlaced: true)],
+			color: SavedGameColor(red: 1.0, green: 0.0, blue: 0.0, opacity: 0.3)
+		)
+		let snapshot = SavedGameSnapshot(
+			rows: 2,
+			columns: 3,
+			colors: 2,
+			suspectsNumber: 2,
+			cells: [[cell, cell, cell], [cell, cell, cell]]
+		)
+
+		let data = try SavedGameSnapshot.encode(snapshot)
+		let decoded = try SavedGameSnapshot.decode(from: data)
+
+		#expect(decoded.rows == snapshot.rows)
+		#expect(decoded.columns == snapshot.columns)
+		#expect(decoded.colors == snapshot.colors)
+		#expect(decoded.suspectsNumber == snapshot.suspectsNumber)
+		#expect(decoded.cells.count == snapshot.cells.count)
+		#expect(decoded.cells[0][0].elements.count == 1)
+		#expect(decoded.cells[0][0].elements.first?.name == "Sospechoso A")
+		#expect(decoded.cells[0][0].color.red == 1.0)
+		#expect(decoded.cells[0][0].color.opacity == 0.3)
+	}
 }

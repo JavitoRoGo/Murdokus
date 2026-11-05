@@ -214,6 +214,33 @@ struct GridEngineTests {
 		#expect(engine.isTimerRunning == false)
 	}
 
+	@Test("Colocar la víctima debe marcar la partida como resuelta con el tiempo transcurrido")
+	func victimPlacementMarksSolved() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 1, colors: 1)
+		engine.handleTimer(.start)
+		
+		let victim = MurdokuObject(name: "Víctima", element: .victim)
+		engine.handleIntent(.move(package: MurdokuTransferPackage(object: victim, sourceRow: -1, sourceCol: -1), destinationRow: 1, destinationCol: 1))
+		
+		#expect(engine.isSolved == true)
+		#expect(engine.solvedTime == engine.elapsedTime)
+	}
+
+	@Test("resetGame debe limpiar el estado de resolución de la partida")
+	func resetGameClearsSolvedState() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 1, colors: 1)
+		engine.handleTimer(.start)
+		
+		let victim = MurdokuObject(name: "Víctima", element: .victim)
+		engine.handleIntent(.move(package: MurdokuTransferPackage(object: victim, sourceRow: -1, sourceCol: -1), destinationRow: 1, destinationCol: 1))
+		#expect(engine.isSolved == true)
+		
+		engine.resetGame()
+		
+		#expect(engine.isSolved == false)
+		#expect(engine.solvedTime == nil)
+	}
+
 	@Test("Colocar un elemento que no sea la víctima no debe detener el temporizador")
 	func nonVictimPlacementKeepsTimerRunning() {
 		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0, colors: 1)

@@ -30,6 +30,14 @@ struct SidebarView: View {
 				}
             }
 			
+			Section("Partidas") {
+				NavigationLink {
+					SavedGamesView()
+				} label: {
+					Label("Mis partidas", systemImage: "archivebox")
+				}
+			}
+			
 			Spacer()
 			
 			HStack(spacing: 10) {

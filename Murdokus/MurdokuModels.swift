@@ -148,3 +148,51 @@ extension UTType {
 	/// The custom uniform type identifier used for Murdoku object transfers.
 	static let murdokuObject = UTType("com.murdoku.object")!
 }
+
+/// The color snapshot of a grid cell, storing its RGBA components.
+struct SavedGameColor: Codable {
+	/// The red component, between 0.0 and 1.0.
+	var red: Double
+	/// The green component, between 0.0 and 1.0.
+	var green: Double
+	/// The blue component, between 0.0 and 1.0.
+	var blue: Double
+	/// The opacity component, between 0.0 and 1.0.
+	var opacity: Double
+}
+
+/// A snapshot of a grid cell: the elements placed in it and its background color.
+struct SavedGameCell: Codable {
+	/// The elements currently placed in the cell.
+	var elements: [MurdokuObject] = []
+	/// The color associated with the cell.
+	var color: SavedGameColor
+}
+
+/// A snapshot of a game board configuration: dimensions, suspects and cell disposition.
+struct SavedGameSnapshot: Codable {
+	/// The number of rows of the saved board.
+	var rows: Int
+	/// The number of columns of the saved board.
+	var columns: Int
+	/// The number of spaces or colors of the saved game board.
+	var colors: Int = 0
+	/// The number of suspects of the saved board.
+	var suspectsNumber: Int
+	/// The cells of the saved board, indexed first by row and then by column.
+	var cells: [[SavedGameCell]]
+}
+
+extension SavedGameSnapshot {
+	/// Encodes the snapshot into JSON data.
+	static func encode(_ snapshot: SavedGameSnapshot) throws -> Data {
+		let encoder = JSONEncoder()
+		return try encoder.encode(snapshot)
+	}
+
+	/// Decodes a snapshot from its JSON data representation.
+	static func decode(from data: Data) throws -> SavedGameSnapshot {
+		let decoder = JSONDecoder()
+		return try decoder.decode(SavedGameSnapshot.self, from: data)
+	}
+}
