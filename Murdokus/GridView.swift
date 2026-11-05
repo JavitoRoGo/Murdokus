@@ -5,7 +5,11 @@ struct GridView: View {
     @Environment(SavedGamesStore.self) private var savedGamesStore
 
     var body: some View {
-        VStack {
+		VStack(spacing: 5) {
+			if let savedGameTitle {
+				Text(savedGameTitle)
+					.font(.largeTitle)
+			}
 			ScrollView([.horizontal, .vertical]) {
 				if engine.rows == 0 || engine.columns == 0 {
 					ContentUnavailableView("Tablero vacío", systemImage: "square.grid.3x3.fill", description: Text("Elige el número de filas y columnas."))
@@ -42,6 +46,11 @@ struct GridView: View {
             .frame(minWidth: max(200, CGFloat(90 * engine.columns)))
         }
 		.background(Color(NSColor.windowBackgroundColor))
+    }
+
+    private var savedGameTitle: String? {
+        guard let savedGameID = engine.savedGameID else { return nil }
+        return savedGamesStore.games.first(where: { $0.id == savedGameID })?.name
     }
 
     private func applyColorToCell(row: Int, col: Int) {

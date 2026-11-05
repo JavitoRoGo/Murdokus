@@ -51,6 +51,12 @@ struct ElementsView: View {
 					Divider()
 					
 					VStack(spacing: 12) {
+						Button("Guardar partida") {
+							saveGameName = ""
+							showingSaveSheet = true
+						}
+						.buttonStyle(.bordered)
+						
 						Button() {
 							withAnimation {
 								engine.activePaintColor = nil
@@ -62,12 +68,6 @@ struct ElementsView: View {
 								.font(.largeTitle)
 						}
 						.buttonStyle(.borderedProminent)
-						
-						Button("Guardar partida") {
-							saveGameName = ""
-							showingSaveSheet = true
-						}
-						.buttonStyle(.bordered)
 					}
 				}
 			} else {

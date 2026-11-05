@@ -14,6 +14,7 @@ final class SavedGame {
 	/// The unique identifier of the saved game.
 	var id: UUID = UUID()
 	/// The name the user gave to the saved game.
+	@Attribute(.unique)
 	var name: String = ""
 	/// The date when the saved game was created.
 	var createdAt: Date = Date()
