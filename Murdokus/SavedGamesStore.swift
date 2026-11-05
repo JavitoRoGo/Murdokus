@@ -68,6 +68,25 @@ final class SavedGamesStore {
 		return newGame
 	}
 
+	/// Returns the saved game that uses the given name, if any.
+	func savedGame(named name: String) -> SavedGame? {
+		games.first { $0.name.lowercased() == name.lowercased() }
+	}
+
+	/// Overwrites the saved game that uses the given name with the data of the provided game.
+	func overwrite(named name: String, with game: SavedGame) throws {
+		guard let existing = savedGame(named: name) else { return }
+		existing.name = game.name
+		existing.createdAt = game.createdAt
+		existing.solveTime = game.solveTime
+		existing.rows = game.rows
+		existing.columns = game.columns
+		existing.colors = game.colors
+		existing.suspectsNumber = game.suspectsNumber
+		existing.boardData = game.boardData
+		try modelContext.save()
+	}
+
 	/// Updates the solve time of the given saved game.
 	func updateSolveTime(of game: SavedGame, solveTime: Double) throws {
 		game.solveTime = solveTime

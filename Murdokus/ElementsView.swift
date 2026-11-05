@@ -13,6 +13,8 @@ struct ElementsView: View {
 
 	@State private var showingSaveSheet = false
 	@State private var saveGameName = ""
+	@State private var showingOverwriteAlert = false
+	@State private var pendingSavedGame: SavedGame?
 
 	var body: some View {
 		let columns = [GridItem(.adaptive(minimum: 130))]
@@ -97,6 +99,9 @@ struct ElementsView: View {
 				
 				TextField("Nombre de la partida", text: $saveGameName)
 					.textFieldStyle(.roundedBorder)
+					.onSubmit {
+						saveGame()
+					}
 				
 				HStack(spacing: 10) {
 					Button("Cancelar") {
@@ -111,6 +116,14 @@ struct ElementsView: View {
 			.padding(20)
 			.frame(minWidth: 320)
 			.background(Color(NSColor.windowBackgroundColor))
+			.alert("El nombre ya existe", isPresented: $showingOverwriteAlert) {
+				Button("Sí, sobrescribir") {
+					saveOverwrite()
+				}
+				Button("No", role: .cancel) {}
+			} message: {
+				Text("Ya existe una partida guardada con el nombre \"\(pendingSavedGame?.name ?? saveGameName)\". ¿Quieres sobrescribirla con los datos actuales?")
+			}
 		}
 	}
 	
@@ -141,6 +154,12 @@ struct ElementsView: View {
 		savedGame.solveTime = nil
 		savedGame.boardData = try? SavedGameSnapshot.encode(snapshot)
 		
+		if savedGamesStore.savedGame(named: trimmedName) != nil {
+			pendingSavedGame = savedGame
+			showingOverwriteAlert = true
+			return
+		}
+		
 		do {
 			let saved = try savedGamesStore.save(savedGame)
 			engine.savedGameID = saved.id
@@ -148,6 +167,24 @@ struct ElementsView: View {
 			return
 		}
 		
+		showingSaveSheet = false
+		saveGameName = ""
+	}
+	
+	/// Overwrites the saved game that uses the given name with the data of the provided game.
+	private func saveOverwrite() {
+		guard let savedGame = pendingSavedGame else { return }
+		
+		do {
+			try savedGamesStore.overwrite(named: savedGame.name, with: savedGame)
+			if let existing = savedGamesStore.savedGame(named: savedGame.name) {
+				engine.savedGameID = existing.id
+			}
+		} catch {
+			return
+		}
+		
+		showingOverwriteAlert = false
 		showingSaveSheet = false
 		saveGameName = ""
 	}

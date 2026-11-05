@@ -24,6 +24,19 @@ struct SingleElementView: View {
 					Circle()
 						.fill(.ultraThickMaterial)
 				}
+				.onDrag {
+					guard canDrag else { return NSItemProvider() }
+					engine.draggingObject = object
+					return NSItemProvider(object: MurdokuObjectProvider(object: object, row: -1, col: -1))
+				} preview: {
+					Image(systemName: object.element.icon(for: object.capitalLetter ?? ""))
+						.resizable()
+						.frame(width: 75, height: 75)
+						.foregroundColor(.black.opacity(0.5))
+						.opacity(canDrag ? 1.0 : 0.3)
+						.padding(10)
+						.background(Circle().fill(.ultraThinMaterial))
+				}
 		}
 		.frame(width: 120)
 		.padding(10)
@@ -38,19 +51,6 @@ struct SingleElementView: View {
             guard object.isPlaced != true else { return }
             engine.handleIntent(.selectSuspect(capitalLetter: object.capitalLetter ?? ""))
         }
-        .onDrag {
-			guard canDrag else { return NSItemProvider() }
-			engine.draggingObject = object
-			return NSItemProvider(object: MurdokuObjectProvider(object: object, row: -1, col: -1))
-		} preview: {
-			Image(systemName: object.element.icon(for: object.capitalLetter ?? ""))
-				.resizable()
-				.frame(width: 75, height: 75)
-				.foregroundColor(.black.opacity(0.5))
-				.opacity(canDrag ? 1.0 : 0.3)
-				.padding(10)
-				.background(Circle().fill(.ultraThinMaterial))
-		}
     }
 	
 	/// Whether this element is the suspect currently selected for candidate placement.

@@ -49,7 +49,7 @@ struct SidebarView: View {
 									Text(game.name)
 										.font(.headline)
 									if let solveTime = game.solveTime {
-										Text("Resuelta en \(Self.formattedTime(solveTime))")
+										Text("Resuelto en \(Self.formattedTime(solveTime))")
 											.font(.subheadline)
 											.foregroundStyle(.secondary)
 									}
