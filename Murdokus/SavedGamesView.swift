@@ -11,9 +11,6 @@ struct SavedGamesView: View {
 	@Environment(GridEngine.self) private var engine
 	@Environment(SavedGamesStore.self) private var savedGamesStore
 
-	@State private var renamingGame: SavedGame? = nil
-	@State private var renameText = ""
-
 	var body: some View {
 		List {
 			ForEach(savedGamesStore.games) { game in
@@ -32,15 +29,6 @@ struct SavedGamesView: View {
 						}
 					}
 					.buttonStyle(.plain)
-
-					Button {
-						renameText = game.name
-						renamingGame = game
-					} label: {
-						Image(systemName: "square.and.pencil")
-							.frame(width: 30, height: 30)
-					}
-					.buttonStyle(.borderedProminent)
 				}
 				.swipeActions {
 					Button("Borrar", role: .destructive) {
@@ -51,36 +39,10 @@ struct SavedGamesView: View {
 		}
 		.listStyle(.inset)
 		.navigationTitle("Partidas guardadas")
-		.onAppear {
-			savedGamesStore.load()
-		}
-		.sheet(isPresented: $isRenameSheetPresented) {
-			if let game = renamingGame {
-				VStack(spacing: 16) {
-					TextField("Nombre de la partida", text: $renameText)
-						.textFieldStyle(.roundedBorder)
-					HStack {
-						Button("Cancelar") {
-							isRenameSheetPresented = false
-							renamingGame = nil
-						}
-						Button("Guardar") {
-							let trimmedName = renameText.trimmingCharacters(in: .whitespacesAndNewlines)
-							if !trimmedName.isEmpty {
-								try? savedGamesStore.updateName(of: game, name: trimmedName)
-							}
-							isRenameSheetPresented = false
-							renamingGame = nil
-						}
-					}
-				}
-				.padding(20)
-			}
-		}
 	}
-
+	
 	/// The presentation state of the rename sheet.
-	@State private var isRenameSheetPresented: Bool = false
+//	@State private var isRenameSheetPresented: Bool = false
 
 	/// Loads the board disposition of the given saved game into the engine.
 	private func load(_ game: SavedGame) {
@@ -102,5 +64,5 @@ struct SavedGamesView: View {
 #Preview {
 	SavedGamesView()
 		.environment(GridEngine())
-		.environment(SavedGamesStore())
+		.environment(SavedGamesStore.preview)
 }

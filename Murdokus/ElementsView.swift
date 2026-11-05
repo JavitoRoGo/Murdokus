@@ -110,6 +110,7 @@ struct ElementsView: View {
 			}
 			.padding(20)
 			.frame(minWidth: 320)
+			.background(Color(NSColor.windowBackgroundColor))
 		}
 	}
 	
@@ -161,5 +162,5 @@ struct ElementsView: View {
 #Preview {
     ElementsView()
 		.environment(GridEngine())
-		.environment(SavedGamesStore())
+		.environment(SavedGamesStore.preview)
 }

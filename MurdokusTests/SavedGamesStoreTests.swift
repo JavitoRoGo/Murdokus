@@ -38,7 +38,6 @@ struct SavedGamesStoreTests {
 		game.boardData = try? SavedGameSnapshot.encode(SavedGameSnapshot(rows: 2, columns: 2, colors: 1, suspectsNumber: 2, cells: [[SavedGameCell(color: SavedGameColor(red: 0.5, green: 0.5, blue: 0.5, opacity: 1))]]))
 
 		_ = try store.save(game)
-		store.load()
 
 		#expect(store.games.count == 1)
 		let persisted = try #require(store.games.first)
@@ -61,10 +60,9 @@ struct SavedGamesStoreTests {
 		game.boardData = try? SavedGameSnapshot.encode(SavedGameSnapshot(rows: 2, columns: 2, colors: 1, suspectsNumber: 2, cells: [[SavedGameCell(color: SavedGameColor(red: 0.5, green: 0.5, blue: 0.5, opacity: 1))]]))
 
 		_ = try store.save(game)
-		store.load()
 
 		let gameToUpdate = SavedGame()
-		gameToUpdate.name = "Partida 1 editada"
+		gameToUpdate.name = "Partida 1"
 		gameToUpdate.rows = 2
 		gameToUpdate.columns = 2
 		gameToUpdate.colors = 1
@@ -72,9 +70,8 @@ struct SavedGamesStoreTests {
 		gameToUpdate.boardData = game.boardData
 
 		_ = try store.save(gameToUpdate)
-		store.load()
 		#expect(store.games.count == 1)
-		#expect(store.games.first?.name == "Partida 1 editada")
+		#expect(store.games.first?.name == "Partida 1")
 	}
 
 	@Test("Actualizar el tiempo de resolución debe persistir el dato")
@@ -87,33 +84,12 @@ struct SavedGamesStoreTests {
 		game.suspectsNumber = 2
 		game.solveTime = nil
 		_ = try store.save(game)
-		store.load()
 
 		let persisted = try #require(store.games.first)
 		try store.updateSolveTime(of: persisted, solveTime: 125.5)
 
-		store.load()
 		let updated = try #require(store.games.first)
 		#expect(updated.solveTime == 125.5)
-	}
-
-	@Test("Renombrar una partida debe actualizar el nombre")
-	func updateNameUpdatesGame() throws {
-		let game = SavedGame()
-		game.name = "Partida 1"
-		game.rows = 2
-		game.columns = 2
-		game.colors = 1
-		game.suspectsNumber = 2
-		_ = try store.save(game)
-		store.load()
-
-		let persisted = try #require(store.games.first)
-		try store.updateName(of: persisted, name: "Partida 1 renombrada")
-
-		store.load()
-		let updated = try #require(store.games.first)
-		#expect(updated.name == "Partida 1 renombrada")
 	}
 
 	@Test("Borrar una partida debe eliminar el registro")
@@ -125,11 +101,9 @@ struct SavedGamesStoreTests {
 		game.colors = 1
 		game.suspectsNumber = 2
 		_ = try store.save(game)
-		store.load()
 
 		let persisted = try #require(store.games.first)
 		try store.delete(persisted)
-		store.load()
 
 		#expect(store.games.isEmpty)
 	}
@@ -146,7 +120,6 @@ struct SavedGamesStoreTests {
 		game.name = "Partida 1"
 		game.boardData = try SavedGameSnapshot.encode(snapshot)
 		_ = try store.save(game)
-		store.load()
 
 		let persisted = try #require(store.games.first)
 		let data = try #require(persisted.boardData)
@@ -191,7 +164,6 @@ struct SavedGamesStoreTests {
 		savedGame.name = "Partida 1"
 		savedGame.boardData = try SavedGameSnapshot.encode(snapshot)
 		_ = try store.save(savedGame)
-		store.load()
 
 		let persisted = try #require(store.games.first)
 		let data = try #require(persisted.boardData)

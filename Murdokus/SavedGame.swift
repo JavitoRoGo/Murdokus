@@ -28,6 +28,7 @@ final class SavedGame {
 	/// The time in seconds it took to solve the game, if it was solved.
 	var solveTime: Double? = nil
 	/// The encoded snapshot of the initial board disposition.
+	@Attribute(.externalStorage)
 	var boardData: Data? = nil
 
 	init() {
