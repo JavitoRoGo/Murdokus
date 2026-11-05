@@ -17,6 +17,11 @@ final class SavedGamesStore {
 	/// The model context used to persist the saved games.
 	private let modelContext: ModelContext
 
+	/// Initializes a new store with the given model context.
+	init(modelContext: ModelContext) {
+		self.modelContext = modelContext
+	}
+
 	/// Initializes a new store with a model container that holds the saved games.
 	init() {
 		let schema = Schema([SavedGame.self])
@@ -44,7 +49,11 @@ final class SavedGamesStore {
 	@discardableResult
 	func save(_ game: SavedGame) throws -> SavedGame {
 		let existing = savedGames.first {
-			$0.name == game.name
+			$0.rows == game.rows &&
+			$0.columns == game.columns &&
+			$0.colors == game.colors &&
+			$0.suspectsNumber == game.suspectsNumber &&
+			$0.boardData == game.boardData
 		}
 
 		if let existing {

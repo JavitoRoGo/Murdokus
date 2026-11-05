@@ -130,7 +130,7 @@ struct ElementsView: View {
 			}
 		)
 		
-		var savedGame = SavedGame()
+		let savedGame = SavedGame()
 		savedGame.name = trimmedName
 		savedGame.createdAt = Date()
 		savedGame.rows = snapshot.rows
