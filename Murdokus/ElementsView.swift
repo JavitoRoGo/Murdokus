@@ -54,7 +54,12 @@ struct ElementsView: View {
 					
 					VStack(spacing: 12) {
 						Button("Guardar partida") {
-							saveGameName = ""
+							if let savedGameID = engine.savedGameID,
+							   let game = savedGamesStore.games.first(where: { $0.id == savedGameID }) {
+								saveGameName = game.name
+							} else {
+								saveGameName = ""
+							}
 							showingSaveSheet = true
 						}
 						.buttonStyle(.bordered)
