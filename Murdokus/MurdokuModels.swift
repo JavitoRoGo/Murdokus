@@ -26,23 +26,29 @@ enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
 	/// A chair that can support other elements stacked on top of it.
 	case chair = "Silla"
 
-	/// A table that can support other elements stacked on top of it.
+	/// A table that cannot support other elements stacked on top of it.
 	case table = "Mesa"
 
 	/// A rug that can support other elements stacked on top of it.
 	case rug = "Alfombra"
 
-	/// A plant that can support other elements stacked on top of it.
+	/// A plant that cannot support other elements stacked on top of it.
 	case plant = "Planta"
 
 	/// A bed that can support other elements stacked on top of it.
 	case bed = "Cama"
 
-	/// A bookshelf that can support other elements stacked on top of it.
+	/// A bookshelf that cannot support other elements stacked on top of it.
 	case bookshelf = "Estantería"
 
-	/// A television that can support other elements stacked on top of it.
+	/// A television that cannot support other elements stacked on top of it.
 	case tv = "TV"
+	
+	/// A car that can support other elements stacked on top of it.
+	case car = "Coche"
+	
+	/// A window that can support other elements stacked on top of it.
+	case window = "Ventana"
 
 	/// The identifier of the element, equal to its raw string value.
 	var id: Self { self }
@@ -67,13 +73,15 @@ enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
 		case .bed: "bed.double.fill"
 		case .bookshelf: "books.vertical"
 		case .tv: "tv"
+		case .car: "car"
+		case .window: "window.casement"
 		}
 	}
 
 	/// Indicates whether the receiver can have other elements stacked on top of it.
 	var canStackOnTop: Bool {
 		switch self {
-		case .chair, .bed, .rug:
+		case .chair, .bed, .rug, .car, .window:
 			return true
 		default:
 			return false

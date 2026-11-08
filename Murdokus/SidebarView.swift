@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct SidebarView: View {
-	@State private var rows: Int = 3
-	@State private var columns: Int = 3
-	@State private var gridColors: Int = 1
-	@State private var suspects: Int = 2
+	@State private var rows: Int = 6
+	@State private var columns: Int = 6
+	@State private var gridColors: Int = 4
+	@State private var suspects: Int = 5
 	@State private var isShowingSavedGames: Bool = false
 	@Environment(GridEngine.self) private var engine
 	@Environment(SavedGamesStore.self) private var savedGamesStore
