@@ -55,6 +55,16 @@ final class GridEngine {
 	var isSolved: Bool = false
 	/// The time in seconds it took to solve the current game session, if solved.
 	var solvedTime: TimeInterval? = nil
+	/// The stack of user actions that can be reverted through undo.
+	var undoStack: [UndoEntry] = []
+	
+	/// Represents an entry in the undo history of the game, capturing the data needed to revert a past action.
+	enum UndoEntry {
+		/// Reverts the addition of an object to a destination cell.
+		case add(object: MurdokuObject, row: Int, col: Int)
+		/// Reverts a deletion by restoring the object to its origin cell.
+		case delete(object: MurdokuObject, row: Int, col: Int)
+	}
 	
 	/// A static list of all available game objects derived from `MurdokuElement`.
 	let objects: [MurdokuObject] = {
@@ -78,6 +88,8 @@ final class GridEngine {
 		case selectSuspect(capitalLetter: String?)
 		/// Toggles the candidate marker of a suspect at the given grid position.
 		case toggleSuspectCandidate(row: Int, col: Int)
+		/// Reverses the most recent recorded action, if any.
+		case undo
 	}
 	
 	/// Represents an action that modifies the state of the game timer.
@@ -108,8 +120,9 @@ final class GridEngine {
 		self.savedGameID = nil
 		self.isSolved = false
 		self.solvedTime = nil
+		self.undoStack.removeAll()
 	}
-
+	
 	/// Generates the game grid and selects the palette of room colors.
 	///
 	/// - Parameter num: The number of distinct colors to provide for the rooms.
@@ -156,12 +169,16 @@ final class GridEngine {
 				withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
 					performMove(package: package, toRow: destRow, col: destCol)
 				}
+				if package.sourceRow == -1 && package.sourceCol == -1 {
+					undoStack.append(.add(object: package.object, row: destRow, col: destCol))
+				}
 			}
 			self.draggingObject = nil
 		case .delete(let package):
 			withAnimation(.spring()) {
 				performDelete(package: package)
 			}
+			undoStack.append(.delete(object: package.object, row: package.sourceRow, col: package.sourceCol))
 			self.draggingObject = nil
 		case .changeColor(let color, let row, let col):
 			setRoomColor(color, atRow: row, col: col)
@@ -170,6 +187,85 @@ final class GridEngine {
 		case .toggleSuspectCandidate(let row, let col):
 			guard let capitalLetter = selectedSuspect else { return }
 			toggleCandidate(atRow: row, col: col, capitalLetter: capitalLetter)
+		case .undo:
+			handleUndo()
+		}
+	}
+	
+	/// Reverses the most recent recorded action, if any.
+	///
+	/// - Note: Undo actions never modify the game timer state.
+	private func handleUndo() {
+		guard !undoStack.isEmpty, !isSolved else { return }
+		let entry = undoStack.removeLast()
+		withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+			switch entry {
+			case .add(let object, let row, let col):
+				undoAddition(object: object, row: row, col: col)
+			case .delete(let object, let row, let col):
+				undoDeletion(object: object, row: row, col: col)
+			}
+		}
+	}
+	
+	/// Reverses the addition of an object to a destination cell by removing it from the grid.
+	///
+	/// - Parameters:
+	///   - object: The object that was added.
+	///   - row: The row of the destination cell.
+	///   - col: The column of the destination cell.
+	private func undoAddition(object: MurdokuObject, row: Int, col: Int) {
+		guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
+		cells[row][col].elements.removeAll { $0.id == object.id }
+		guard object.element == .suspect else { return }
+		markSuspectAsUnplaced(capitalLetter: object.capitalLetter)
+		if let capitalLetter = object.capitalLetter {
+			suspectCandidates[capitalLetter] = Set<CellKey>()
+		}
+		clearXMarks(forRow: row, col: col)
+	}
+	
+	/// Reverses a deletion by restoring the object to its origin cell.
+	///
+	/// - Parameters:
+	///   - object: The object that was deleted.
+	///   - row: The row of the origin cell.
+	///   - col: The column of the origin cell.
+	private func undoDeletion(object: MurdokuObject, row: Int, col: Int) {
+		guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
+		if !cells[row][col].elements.contains(where: { $0.id == object.id }) {
+			cells[row][col].elements.append(object)
+		}
+		if object.element == .suspect, let capitalLetter = object.capitalLetter {
+			markSuspectAsPlaced(capitalLetter: capitalLetter)
+		}
+	}
+	
+	/// Marks a suspect as no longer placed in the grid.
+	///
+	/// - Parameter capitalLetter: The identifying letter of the suspect.
+	private func markSuspectAsUnplaced(capitalLetter: String?) {
+		suspects = suspects.map { suspect in
+			guard suspect.capitalLetter == capitalLetter else { return suspect }
+			var unplacedSuspect = suspect
+			unplacedSuspect.isPlaced = false
+			return unplacedSuspect
+		}
+	}
+	
+	/// Clears all the X-marks that affect the given row and column.
+	///
+	/// - Parameters:
+	///   - row: The row of the placement trigger.
+	///   - col: The column of the placement trigger.
+	private func clearXMarks(forRow row: Int, col: Int) {
+		for r in 0..<rows {
+			for c in 0..<columns {
+				if r == row || c == col {
+					guard r != row || c != col else { continue }
+					cells[r][c].elements.removeAll { $0.element == .xMark }
+				}
+			}
 		}
 	}
 	
@@ -396,6 +492,7 @@ final class GridEngine {
 		self.savedGameID = nil
 		self.isSolved = false
 		self.solvedTime = nil
+		self.undoStack.removeAll()
 	}
 	
 	/// Loads a saved game snapshot into the engine, preparing a new game session.
@@ -416,5 +513,6 @@ final class GridEngine {
 
 		self.isSolved = false
 		self.solvedTime = solveTime
+		self.undoStack.removeAll()
 	}
 }
