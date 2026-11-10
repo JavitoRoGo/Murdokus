@@ -60,8 +60,8 @@ final class GridEngine {
 	
 	/// Represents an entry in the undo history of the game, capturing the data needed to revert a past action.
 	enum UndoEntry {
-		/// Reverts the addition of an object to a destination cell.
-		case add(object: MurdokuObject, row: Int, col: Int)
+		/// Reverts the addition of an object to a destination cell, clearing the X-marks it introduced.
+		case add(object: MurdokuObject, row: Int, col: Int, xMarks: [CellKey])
 		/// Reverts a deletion by restoring the object to its origin cell.
 		case delete(object: MurdokuObject, row: Int, col: Int)
 	}
@@ -166,11 +166,11 @@ final class GridEngine {
 		switch intent {
 		case .move(let package, let destRow, let destCol):
 			if canPlaceObject(atRow: destRow, col: destCol, newObject: package.object) {
-				withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+				let addedXMarks = withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
 					performMove(package: package, toRow: destRow, col: destCol)
 				}
-				if package.sourceRow == -1 && package.sourceCol == -1 {
-					undoStack.append(.add(object: package.object, row: destRow, col: destCol))
+				if package.sourceRow == -1 && package.sourceCol == -1, package.object.isUndoable {
+					undoStack.append(.add(object: package.object, row: destRow, col: destCol, xMarks: addedXMarks))
 				}
 			}
 			self.draggingObject = nil
@@ -178,7 +178,9 @@ final class GridEngine {
 			withAnimation(.spring()) {
 				performDelete(package: package)
 			}
-			undoStack.append(.delete(object: package.object, row: package.sourceRow, col: package.sourceCol))
+			if package.object.isUndoable {
+				undoStack.append(.delete(object: package.object, row: package.sourceRow, col: package.sourceCol))
+			}
 			self.draggingObject = nil
 		case .changeColor(let color, let row, let col):
 			setRoomColor(color, atRow: row, col: col)
@@ -200,8 +202,8 @@ final class GridEngine {
 		let entry = undoStack.removeLast()
 		withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
 			switch entry {
-			case .add(let object, let row, let col):
-				undoAddition(object: object, row: row, col: col)
+			case .add(let object, let row, let col, let xMarks):
+				undoAddition(object: object, row: row, col: col, xMarks: xMarks)
 			case .delete(let object, let row, let col):
 				undoDeletion(object: object, row: row, col: col)
 			}
@@ -214,7 +216,7 @@ final class GridEngine {
 	///   - object: The object that was added.
 	///   - row: The row of the destination cell.
 	///   - col: The column of the destination cell.
-	private func undoAddition(object: MurdokuObject, row: Int, col: Int) {
+	private func undoAddition(object: MurdokuObject, row: Int, col: Int, xMarks: [CellKey]) {
 		guard row >= 0 && row < rows && col >= 0 && col < columns else { return }
 		cells[row][col].elements.removeAll { $0.id == object.id }
 		guard object.element == .suspect else { return }
@@ -222,7 +224,11 @@ final class GridEngine {
 		if let capitalLetter = object.capitalLetter {
 			suspectCandidates[capitalLetter] = Set<CellKey>()
 		}
-		clearXMarks(forRow: row, col: col)
+		for xMark in xMarks {
+			if cells[xMark.row][xMark.col].elements.contains(where: { $0.element == .xMark }) {
+				cells[xMark.row][xMark.col].elements.removeAll { $0.element == .xMark }
+			}
+		}
 	}
 	
 	/// Reverses a deletion by restoring the object to its origin cell.
@@ -250,22 +256,6 @@ final class GridEngine {
 			var unplacedSuspect = suspect
 			unplacedSuspect.isPlaced = false
 			return unplacedSuspect
-		}
-	}
-	
-	/// Clears all the X-marks that affect the given row and column.
-	///
-	/// - Parameters:
-	///   - row: The row of the placement trigger.
-	///   - col: The column of the placement trigger.
-	private func clearXMarks(forRow row: Int, col: Int) {
-		for r in 0..<rows {
-			for c in 0..<columns {
-				if r == row || c == col {
-					guard r != row || c != col else { continue }
-					cells[r][c].elements.removeAll { $0.element == .xMark }
-				}
-			}
 		}
 	}
 	
@@ -354,11 +344,12 @@ final class GridEngine {
 	///   - toRow: The destination row.
 	///   - col: The destination column.
 	/// - Note: If a suspect is moved, X-mark rules are applied across the row and column.
-	private func performMove(package: MurdokuTransferPackage, toRow: Int, col: Int) {
-		guard toRow >= 0 && toRow < rows && col >= 0 && col < columns else { return }
+	private func performMove(package: MurdokuTransferPackage, toRow: Int, col: Int) -> [CellKey] {
+		guard toRow >= 0 && toRow < rows && col >= 0 && col < columns else { return [] }
+		var addedXMarks: [CellKey] = []
 		if package.object.element == .suspect {
 			markSuspectAsPlaced(capitalLetter: package.object.capitalLetter)
-			applyXMarkRules(forRow: toRow, col: col)
+			addedXMarks = applyXMarkRules(forRow: toRow, col: col)
 			if let letter = package.object.capitalLetter {
 				suspectCandidates[letter] = Set<CellKey>()
 			}
@@ -376,6 +367,7 @@ final class GridEngine {
 			isSolved = true
 			solvedTime = elapsedTime
 		}
+		return addedXMarks
 	}
 	
 	/// Updates the placement status of a suspect based on their identifier.
@@ -424,18 +416,23 @@ final class GridEngine {
 	///   - row: The row of the placement trigger.
 	///   - col: The column of the placement trigger.
 	/// - Note: All cells in the same row and column as the trigger are filled with X-marks, except the trigger cell itself.
-	private func applyXMarkRules(forRow row: Int, col: Int) {
+	private func applyXMarkRules(forRow row: Int, col: Int) -> [CellKey] {
 		let xMarkObject = MurdokuObject(name: "Bloqueo", element: .xMark)
+		var addedXMarks: [CellKey] = []
 		
 		for r in 0..<rows {
 			for c in 0..<columns {
 				if r == row || c == col {
 					guard r != row || c != col else { continue }
-					cells[r][c].elements.append(xMarkObject)
+					if !cells[r][c].elements.contains(where: { $0.element == .xMark }) {
+						cells[r][c].elements.append(xMarkObject)
+						addedXMarks.append(CellKey(row: r, col: c))
+					}
 					clearCandidate(atRow: r, col: c)
 				}
 			}
 		}
+		return addedXMarks
 	}
 
 	/// Sets the background color of a specific grid cell.

@@ -112,6 +112,14 @@ struct MurdokuObject: Identifiable, Codable, Transferable {
 	/// A flag indicating whether the object has been placed in the grid.
 	var isPlaced: Bool? = nil
 
+	/// Indicates whether the object participates in the undo history.
+	///
+	/// Only suspects and X-marks are undoable; other game objects such as
+	/// furniture are part of the board state but not of the player's action history.
+	var isUndoable: Bool {
+		self.element == .suspect || self.element == .xMark
+	}
+
 	/// The custom transfer representation used to encode and decode the object.
 	static var transferRepresentation: CodableRepresentation<MurdokuObject, JSONEncoder, JSONDecoder> {
 		CodableRepresentation(contentType: .murdokuObject)

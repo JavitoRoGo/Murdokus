@@ -38,7 +38,15 @@ struct GridView: View {
 							}
 						}
 						
-						TrashView()
+						VStack(spacing: 5) {
+							Button("Deshacer") {
+								engine.handleIntent(.undo)
+							}
+							.buttonStyle(.bordered)
+							.disabled(engine.isSolved || engine.undoStack.isEmpty)
+							
+							TrashView()
+						}
 					}
 					.padding(20)
 				}
