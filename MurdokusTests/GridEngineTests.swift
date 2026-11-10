@@ -355,4 +355,97 @@ struct GridEngineTests {
 		#expect(engine.suspectCandidates.isEmpty)
 		#expect(engine.selectedSuspect == nil)
 	}
+
+	@Test("El undo de la colocación de un sospechoso debe eliminarlo, liberar su posición y conservar el temporizador")
+	func undoPlacementRemovesSuspect() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 2, colors: 1)
+		engine.handleTimer(.start)
+
+		let suspect = MurdokuObject(name: "Sospechoso A", element: .suspect, capitalLetter: "A")
+		engine.handleIntent(.move(package: MurdokuTransferPackage(object: suspect, sourceRow: -1, sourceCol: -1), destinationRow: 1, destinationCol: 1))
+
+		#expect(engine.undoStack.count == 1)
+
+		engine.handleIntent(.undo)
+
+		#expect(engine.undoStack.isEmpty)
+		#expect(engine.cells[1][1].elements.isEmpty)
+		#expect(engine.suspects.first { $0.capitalLetter == "A" }?.isPlaced == false)
+		#expect(engine.isTimerRunning == true)
+	}
+
+	@Test("El undo de una colocación de sospechoso debe limpiar solo las marcas X añadidas")
+	func undoClearsOnlyAddedXMarks() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 2, colors: 1)
+
+		let suspectA = MurdokuObject(name: "Sospechoso A", element: .suspect, capitalLetter: "A")
+		engine.handleIntent(.move(package: MurdokuTransferPackage(object: suspectA, sourceRow: -1, sourceCol: -1), destinationRow: 1, destinationCol: 1))
+
+		let suspectB = MurdokuObject(name: "Sospechoso B", element: .suspect, capitalLetter: "B")
+		engine.handleIntent(.move(package: MurdokuTransferPackage(object: suspectB, sourceRow: -1, sourceCol: -1), destinationRow: 2, destinationCol: 2))
+
+		#expect(engine.undoStack.count == 2)
+
+		engine.handleIntent(.undo)
+
+		#expect(engine.cells[2][2].elements.isEmpty)
+		#expect(engine.cells[2][0].elements.contains { $0.element == .xMark } == false)
+		#expect(engine.cells[0][2].elements.contains { $0.element == .xMark } == false)
+		#expect(engine.cells[1][0].elements.contains { $0.element == .xMark } == true)
+		#expect(engine.cells[1][2].elements.contains { $0.element == .xMark } == true)
+		#expect(engine.cells[0][1].elements.contains { $0.element == .xMark } == true)
+		#expect(engine.cells[2][1].elements.contains { $0.element == .xMark } == true)
+		#expect(engine.undoStack.count == 1)
+	}
+
+	@Test("El undo debe ignorarse cuando la partida está resuelta")
+	func undoDisabledWhenSolved() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 1, colors: 1)
+
+		let suspect = MurdokuObject(name: "Sospechoso A", element: .suspect, capitalLetter: "A")
+		engine.handleIntent(.move(package: MurdokuTransferPackage(object: suspect, sourceRow: -1, sourceCol: -1), destinationRow: 1, destinationCol: 1))
+
+		let victim = MurdokuObject(name: "Víctima", element: .victim)
+		engine.handleIntent(.move(package: MurdokuTransferPackage(object: victim, sourceRow: -1, sourceCol: -1), destinationRow: 2, destinationCol: 2))
+
+		#expect(engine.isSolved == true)
+
+		engine.handleIntent(.undo)
+
+		#expect(engine.undoStack.count == 1)
+		#expect(engine.cells[1][1].elements.contains { $0.element == .suspect })
+	}
+
+	@Test("El undo no debe registrarse para objetos de mobiliario")
+	func undoFurnitureNotRecorded() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0, colors: 1)
+
+		let chair = MurdokuObject(name: "Silla", element: .chair)
+		engine.handleIntent(.move(package: MurdokuTransferPackage(object: chair, sourceRow: -1, sourceCol: -1), destinationRow: 1, destinationCol: 1))
+
+		#expect(engine.undoStack.isEmpty)
+
+		engine.handleIntent(.undo)
+
+		#expect(engine.undoStack.isEmpty)
+		#expect(engine.cells[1][1].elements.contains { $0.element == .chair })
+	}
+
+	@Test("El undo de un borrado debe restaurar el objeto en su celda original")
+	func undoDeletionRestoresObject() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 1, colors: 1)
+
+		let suspect = MurdokuObject(name: "Sospechoso A", element: .suspect, capitalLetter: "A")
+		engine.handleIntent(.move(package: MurdokuTransferPackage(object: suspect, sourceRow: -1, sourceCol: -1), destinationRow: 1, destinationCol: 1))
+
+		let deletePackage = MurdokuTransferPackage(object: suspect, sourceRow: 1, sourceCol: 1)
+		engine.handleIntent(.delete(package: deletePackage))
+
+		#expect(engine.cells[1][1].elements.isEmpty)
+		#expect(engine.undoStack.count == 2)
+
+		engine.handleIntent(.undo)
+
+		#expect(engine.cells[1][1].elements.contains { $0.element == .suspect })
+	}
 }
