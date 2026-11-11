@@ -13,12 +13,16 @@ struct SingleElementView: View {
 	
 	let object: MurdokuObject
 	
+	private var icon: some View {
+		object.element.icon(for: object.capitalLetter ?? "")
+	}
+	
     var body: some View {
 		HStack {
 			Text(object.name)
 			Spacer()
-			Image(systemName: object.element.icon(for: object.capitalLetter ?? ""))
-				.font(object.element == .suspect ? .largeTitle : .title2)
+			icon
+				.font(object.element == .suspect ? .largeTitle : .title)
 				.padding(10)
 				.background {
 					Circle()
@@ -29,9 +33,9 @@ struct SingleElementView: View {
 					engine.draggingObject = object
 					return NSItemProvider(object: MurdokuObjectProvider(object: object, row: -1, col: -1))
 				} preview: {
-					Image(systemName: object.element.icon(for: object.capitalLetter ?? ""))
-						.resizable()
-						.frame(width: 75, height: 75)
+					icon
+						.font(.largeTitle)
+						.frame(width: 50, height: 50)
 						.foregroundColor(.black.opacity(0.5))
 						.opacity(canDrag ? 1.0 : 0.3)
 						.padding(10)

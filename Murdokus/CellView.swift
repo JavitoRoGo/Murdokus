@@ -25,10 +25,10 @@ struct CellView: View {
                 .background(hoverBackground)
 				.border(Color.black.opacity(0.1), width: 0.5)
 
-            ForEach(cell.elements, id: \.id) { object in
-                Image(systemName: object.element.icon(for: object.capitalLetter ?? ""))
-                    .resizable()
-                    .frame(width: 65, height: 65)
+            ForEach(cell.elements) { object in
+                icon(for: object)
+					.font(.system(size: 60))
+                    .frame(width: 60, height: 60)
                     .foregroundColor(.black.opacity(0.7))
             }
 
@@ -63,9 +63,9 @@ struct CellView: View {
             }
         } preview: {
             if let topObject = cell.elements.last {
-                Image(systemName: topObject.element.icon(for: topObject.capitalLetter ?? ""))
-                    .resizable()
-                    .frame(width: 65, height: 65)
+                icon(for: topObject)
+					.font(.largeTitle)
+                    .frame(width: 50, height: 50)
                     .foregroundColor(.black.opacity(0.7))
                     .padding(10)
                     .background(Circle().fill(.ultraThinMaterial))
@@ -73,6 +73,11 @@ struct CellView: View {
                 Color.clear
             }
         }
+	}
+	
+	@ViewBuilder
+	private func icon(for object: MurdokuObject) -> some View {
+		object.element.icon(for: object.capitalLetter ?? "")
 	}
 
 	@ViewBuilder

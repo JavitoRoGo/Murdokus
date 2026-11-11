@@ -49,6 +49,21 @@ enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
 	
 	/// A window that can support other elements stacked on top of it.
 	case window = "Ventana"
+	
+	/// A cash machine that cannot support other elements stacked on top of it.
+	case cash = "Registradora"
+	
+	/// A rock that cannot support other elements stacked on top of it.
+	case rock = "Roca"
+	
+	/// A statue that cannot support other elements stacked on top of it.
+	case statue = "Estatua"
+	
+	/// A rubble that cannot support other elements stacked on top of it.
+	case rubble = "Escombros"
+	
+	/// A tree that cannot support other elements stacked on top of it.
+	case tree = "Árbol"
 
 	/// The identifier of the element, equal to its raw string value.
 	var id: Self { self }
@@ -61,20 +76,26 @@ enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
 	///
 	/// - Parameter suspect: The identifier of the suspect used to build the symbol name.
 	/// - Returns: The SF Symbols name that represents the element.
-	func icon(for suspect: String = "") -> String {
+	@ViewBuilder
+	func icon(for suspect: String = "") -> some View {
 		switch self {
-		case .suspect: "\(suspect.lowercased()).circle.fill"
-		case .victim: "person.fill.xmark"
-		case .xMark: "xmark"
-		case .chair: "chair.lounge"
-		case .table: "table.furniture"
-		case .rug: "light.panel"
-		case .plant: "camera.macro"
-		case .bed: "bed.double.fill"
-		case .bookshelf: "books.vertical"
-		case .tv: "tv"
-		case .car: "car"
-		case .window: "window.casement"
+		case .suspect: Image(systemName: "\(suspect.lowercased()).circle.fill")
+		case .victim: Text("😵")
+		case .xMark: Image(systemName: "xmark")
+		case .chair: Text("🪑")
+		case .table: Text("🟫")
+		case .rug: Text("🔲")
+		case .plant: Text("🪴")
+		case .bed: Text("🛏️")
+		case .bookshelf: Text("📚")
+		case .tv: Text("📺")
+		case .car: Text("🚙")
+		case .window: Text("🪟")
+		case .cash: Text("💰")
+		case .rock: Text("🪨")
+		case .statue: Text("🗿")
+		case .rubble: Text("🛘")
+		case .tree: Text("🌳")
 		}
 	}
 

@@ -12,22 +12,22 @@ struct SidebarView: View {
     var body: some View {
         List {
             Section("Tablero") {
-				Stepper(value: $rows, in: 1...9) {
+				Stepper(value: $rows, in: 1...18) {
 					Text("Filas: \(rows)")
 				}
-				Stepper(value: $columns, in: 1...9) {
+				Stepper(value: $columns, in: 1...18) {
 					Text("Columnas: \(columns)")
 				}
             }
 			
 			Section("Espacios") {
-				Stepper(value: $gridColors, in: 1...10) {
+				Stepper(value: $gridColors, in: 1...15) {
 					Text("Espacios: \(gridColors)")
 				}
 			}
 			
 			Section("Sospechosos") {
-				Stepper(value: $suspects, in: 1...8) {
+				Stepper(value: $suspects, in: 1...17) {
 					Text("Sospechosos: \(suspects)")
 				}
             }
