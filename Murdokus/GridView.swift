@@ -1,3 +1,10 @@
+//
+//  GridView.swift
+//  Murdokus
+//
+//  Created by Javier Rodríguez Gómez on 19/10/2026.
+//
+
 import SwiftUI
 
 struct GridView: View {
@@ -5,60 +12,66 @@ struct GridView: View {
     @Environment(SavedGamesStore.self) private var savedGamesStore
 
     var body: some View {
-		VStack(spacing: 5) {
-			if let savedGameTitle {
-				Text(savedGameTitle)
-					.font(.largeTitle)
-			}
-			ScrollView([.horizontal, .vertical]) {
-				if engine.rows == 0 || engine.columns == 0 {
-					ContentUnavailableView("Tablero vacío", systemImage: "square.grid.3x3.fill", description: Text("Elige el número de filas y columnas."))
-				} else {
-					VStack(spacing: 16) {
-						if engine.isSolved {
-							Button("Guardar tiempo") {
-								saveTime()
-							}
-							.buttonStyle(.bordered)
-						}
-						TimerView()
-					}
-					Divider()
-					HStack(spacing: 20) {
-						VStack(spacing: 0) {
-							ForEach(0..<engine.rows, id: \.self) { row in
-								HStack(spacing: 0) {
-									ForEach(0..<engine.columns, id: \.self) { col in
-										CellView(cell: engine.cells[row][col], row: row, col: col)
-											.onTapGesture {
-												applyColorToCell(row: row, col: col)
-											}
-									}
-								}
-							}
-						}
-						
-						VStack(spacing: 5) {
-							Button("Deshacer") {
-								engine.handleIntent(.undo)
-							}
-							.buttonStyle(.bordered)
-							.disabled(engine.isSolved || engine.undoStack.isEmpty)
-							
-							TrashView()
-						}
-					}
-					.padding(20)
-				}
-			}
+        VStack(spacing: 5) {
+            if let savedGameTitle {
+                Text(savedGameTitle)
+                    .font(.largeTitle)
+            }
+            ScrollView([.horizontal, .vertical]) {
+                if engine.rows == 0 || engine.columns == 0 {
+                    ContentUnavailableView("Tablero vacío", systemImage: "square.grid.3x3.fill", description: Text("Elige el número de filas y columnas."))
+                } else {
+                    VStack(spacing: 16) {
+                        if engine.isSolved, isGameSaved {
+                            Button("Guardar tiempo") {
+                                saveTime()
+                            }
+                            .buttonStyle(.bordered)
+                        }
+                        TimerView()
+                    }
+                    Divider()
+                    HStack(spacing: 20) {
+                        VStack(spacing: 0) {
+                            ForEach(0..<engine.rows, id: \.self) { row in
+                                HStack(spacing: 0) {
+                                    ForEach(0..<engine.columns, id: \.self) { col in
+                                        CellView(cell: engine.cells[row][col], row: row, col: col)
+                                            .onTapGesture {
+                                                applyColorToCell(row: row, col: col)
+                                            }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        VStack(spacing: 5) {
+                            Button("Deshacer") {
+                                engine.handleIntent(.undo)
+                            }
+                            .buttonStyle(.bordered)
+                            .disabled(engine.isSolved || engine.undoStack.isEmpty)
+                            
+                            TrashView()
+                        }
+                    }
+                    .padding(20)
+                }
+            }
             .frame(minWidth: max(200, CGFloat(90 * engine.columns)))
         }
-		.background(Color(NSColor.windowBackgroundColor))
+        .background(Color(NSColor.windowBackgroundColor))
     }
 
     private var savedGameTitle: String? {
         guard let savedGameID = engine.savedGameID else { return nil }
         return savedGamesStore.games.first(where: { $0.id == savedGameID })?.name
+    }
+
+    /// Indicates whether the current session corresponds to a previously saved game.
+    private var isGameSaved: Bool {
+        guard let savedGameID = engine.savedGameID else { return false }
+        return savedGamesStore.games.contains { $0.id == savedGameID }
     }
 
     private func applyColorToCell(row: Int, col: Int) {
@@ -80,6 +93,6 @@ struct GridView: View {
 }
 
 #Preview {
-	GridView()
-		.environment(GridEngine())
+    GridView()
+        .environment(GridEngine())
 }

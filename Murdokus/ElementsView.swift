@@ -13,8 +13,6 @@ struct ElementsView: View {
 
 	@State private var showingSaveSheet = false
 	@State private var saveGameName = ""
-	@State private var showingOverwriteAlert = false
-	@State private var pendingSavedGame: SavedGame?
 
 	var body: some View {
 		let columns = [GridItem(.adaptive(minimum: 130))]
@@ -97,112 +95,13 @@ struct ElementsView: View {
 		.padding()
 		.background(Color(NSColor.windowBackgroundColor))
 		.sheet(isPresented: $showingSaveSheet) {
-			VStack(spacing: 16) {
-				Text("Ponle un nombre a tu partida para poder identificarla después.")
-					.font(.headline)
-					.multilineTextAlignment(.center)
-				
-				TextField("Nombre de la partida", text: $saveGameName)
-					.textFieldStyle(.roundedBorder)
-					.onSubmit {
-						saveGame()
-					}
-				
-				HStack(spacing: 10) {
-					Button("Cancelar") {
-						showingSaveSheet = false
-					}
-					Button("Guardar") {
-						saveGame()
-					}
-					.disabled(saveGameName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-				}
-			}
-			.padding(20)
-			.frame(minWidth: 320)
-			.background(Color(NSColor.windowBackgroundColor))
-			.alert("El nombre ya existe", isPresented: $showingOverwriteAlert) {
-				Button("Sí, sobrescribir") {
-					saveOverwrite()
-				}
-				Button("No", role: .cancel) {}
-			} message: {
-				Text("Ya existe una partida guardada con el nombre \"\(pendingSavedGame?.name ?? saveGameName)\". ¿Quieres sobrescribirla con los datos actuales?")
-			}
+			SaveGameSheet(saveGameName: $saveGameName, solveTime: nil)
 		}
-	}
-	
-	/// Saves the current game configuration and board disposition under the given name.
-	private func saveGame() {
-		let trimmedName = saveGameName.trimmingCharacters(in: .whitespacesAndNewlines)
-		guard !trimmedName.isEmpty else { return }
-		
-		let snapshot = SavedGameSnapshot(
-			rows: engine.rows,
-			columns: engine.columns,
-			colors: engine.roomColors.count,
-			suspectsNumber: engine.suspects.count,
-			cells: engine.cells.map { row in
-				row.map { cell in
-					SavedGameCell(elements: cell.elements, color: savedGameColor(from: cell.color))
-				}
-			}
-		)
-		
-		let savedGame = SavedGame()
-		savedGame.name = trimmedName
-		savedGame.createdAt = Date()
-		savedGame.rows = snapshot.rows
-		savedGame.columns = snapshot.columns
-		savedGame.colors = snapshot.colors
-		savedGame.suspectsNumber = snapshot.suspectsNumber
-		savedGame.solveTime = nil
-		savedGame.boardData = try? SavedGameSnapshot.encode(snapshot)
-		
-		if savedGamesStore.savedGame(named: trimmedName) != nil {
-			pendingSavedGame = savedGame
-			showingOverwriteAlert = true
-			return
-		}
-		
-		do {
-			let saved = try savedGamesStore.save(savedGame)
-			engine.savedGameID = saved.id
-		} catch {
-			return
-		}
-		
-		showingSaveSheet = false
-		saveGameName = ""
-	}
-	
-	/// Overwrites the saved game that uses the given name with the data of the provided game.
-	private func saveOverwrite() {
-		guard let savedGame = pendingSavedGame else { return }
-		
-		do {
-			try savedGamesStore.overwrite(named: savedGame.name, with: savedGame)
-			if let existing = savedGamesStore.savedGame(named: savedGame.name) {
-				engine.savedGameID = existing.id
-			}
-		} catch {
-			return
-		}
-		
-		showingOverwriteAlert = false
-		showingSaveSheet = false
-		saveGameName = ""
-	}
-	
-	/// Builds the color snapshot of a grid cell from its SwiftUI color.
-	private func savedGameColor(from color: Color) -> SavedGameColor {
-		let components = ColorHelper.decomposeColor(color)
-		return SavedGameColor(red: components.red, green: components.green, blue: components.blue, opacity: components.opacity)
 	}
 }
 
 #Preview {
     ElementsView()
-		.environment(GridEngine())
-		.environment(SavedGamesStore.preview)
+        .environment(GridEngine())
+        .environment(SavedGamesStore.preview)
 }

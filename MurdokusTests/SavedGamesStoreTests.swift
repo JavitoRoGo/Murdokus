@@ -176,4 +176,34 @@ struct SavedGamesStoreTests {
 		#expect(engine.cells[1][1].elements.count == 1)
 		#expect(engine.cells[1][1].elements.first?.name == "Silla")
 	}
+
+	@Test("Cargar una partida resuelta guardada debe restaurar el estado final y el tiempo de resolución")
+	func savedSolvedGameRestoresEngineState() throws {
+		let engine = GridEngine()
+		engine.setupGameWith(rows: 2, columns: 2, suspectsNumber: 1, colors: 1)
+		engine.handleTimer(.start)
+
+		let victim = MurdokuObject(name: "Víctima", element: .victim)
+		engine.handleIntent(.move(package: MurdokuTransferPackage(object: victim, sourceRow: -1, sourceCol: -1), destinationRow: 1, destinationCol: 1))
+
+		#expect(engine.isSolved == true)
+		let solveTime = engine.solvedTime
+		let snapshot = engine.boardSnapshot()
+
+		let savedGame = SavedGame()
+		savedGame.name = "Partida 1"
+		savedGame.boardData = try SavedGameSnapshot.encode(snapshot)
+		savedGame.solveTime = solveTime
+		_ = try store.save(savedGame)
+
+		let persisted = try #require(store.games.first)
+		let data = try #require(persisted.boardData)
+		let decoded = try SavedGameSnapshot.decode(from: data)
+
+		engine.loadSavedGame(decoded, solveTime: persisted.solveTime)
+
+		#expect(engine.solvedTime == persisted.solveTime)
+		#expect(engine.cells[1][1].elements.count == 1)
+		#expect(engine.cells[1][1].elements.first?.element == .victim)
+	}
 }

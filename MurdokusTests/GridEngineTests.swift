@@ -448,4 +448,27 @@ struct GridEngineTests {
 
 		#expect(engine.cells[1][1].elements.contains { $0.element == .suspect })
 	}
+
+	@Test("El snapshot del tablero debe capturar los elementos y colores colocados")
+	func boardSnapshotCapturesPlacedElements() {
+		engine.setupGameWith(rows: 3, columns: 3, suspectsNumber: 0, colors: 1)
+		engine.handleIntent(.changeColor(color: Color.red, row: 2, col: 2))
+
+		let chair = MurdokuObject(name: "Silla", element: .chair)
+		engine.handleIntent(.move(package: MurdokuTransferPackage(object: chair, sourceRow: -1, sourceCol: -1), destinationRow: 1, destinationCol: 1))
+
+		let snapshot = engine.boardSnapshot()
+
+		#expect(snapshot.rows == 3)
+		#expect(snapshot.columns == 3)
+		#expect(snapshot.colors == 1)
+		#expect(snapshot.cells[1][1].elements.count == 1)
+		#expect(snapshot.cells[1][1].elements.first?.name == "Silla")
+
+		let liveComponents = ColorHelper.decomposeColor(engine.cells[2][2].color)
+		#expect(snapshot.cells[2][2].color.red == liveComponents.red)
+		#expect(snapshot.cells[2][2].color.green == liveComponents.green)
+		#expect(snapshot.cells[2][2].color.blue == liveComponents.blue)
+		#expect(snapshot.cells[2][2].color.opacity == liveComponents.opacity)
+	}
 }

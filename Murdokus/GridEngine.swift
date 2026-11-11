@@ -121,6 +121,28 @@ final class GridEngine {
 		self.isSolved = false
 		self.solvedTime = nil
 		self.undoStack.removeAll()
+		self.showingSuspects = false
+	}
+	
+	/// Builds a snapshot of the current board state, used for saving and restoring game sessions.
+	///
+	/// - Returns: The snapshot with the current grid dimensions, suspects and cell contents.
+	func boardSnapshot() -> SavedGameSnapshot {
+		SavedGameSnapshot(
+			rows: rows,
+			columns: columns,
+			colors: roomColors.count,
+			suspectsNumber: suspects.count,
+			cells: cells.map { row in
+				row.map { cell in
+					let components = ColorHelper.decomposeColor(cell.color)
+					return SavedGameCell(
+						elements: cell.elements,
+						color: SavedGameColor(red: components.red, green: components.green, blue: components.blue, opacity: components.opacity)
+					)
+				}
+			}
+		)
 	}
 	
 	/// Generates the game grid and selects the palette of room colors.
