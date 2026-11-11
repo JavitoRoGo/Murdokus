@@ -32,6 +32,26 @@ struct SidebarView: View {
 				}
             }
 			
+			Spacer()
+			
+			HStack(spacing: 10) {
+				Button("Configurar") {
+					engine.showingSuspects = false
+					engine.handleTimer(.reset)
+					engine.setupGameWith(rows: rows, columns: columns, suspectsNumber: suspects, colors: gridColors)
+				}
+				.buttonStyle(.bordered)
+				Button("Borrar", role: .destructive) {
+					engine.showingSuspects = false
+					rows = 0
+					columns = 0
+					suspects = 0
+					gridColors = 0
+					engine.handleTimer(.reset)
+					engine.resetGame()
+				}
+			}
+			
 			Section {
 				Button {
 					isShowingSavedGames.toggle()
@@ -67,26 +87,6 @@ struct SidebarView: View {
 					Text("Pulsa sobre una línea para cargar el tablero.")
 						.font(.caption2)
 						.foregroundStyle(.secondary)
-				}
-			}
-			
-			Spacer()
-			
-			HStack(spacing: 10) {
-				Button("Configurar") {
-					engine.showingSuspects = false
-					engine.handleTimer(.reset)
-					engine.setupGameWith(rows: rows, columns: columns, suspectsNumber: suspects, colors: gridColors)
-				}
-				.buttonStyle(.bordered)
-				Button("Borrar", role: .destructive) {
-					engine.showingSuspects = false
-					rows = 0
-					columns = 0
-					suspects = 0
-					gridColors = 0
-					engine.handleTimer(.reset)
-					engine.resetGame()
 				}
 			}
         }
