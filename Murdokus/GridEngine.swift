@@ -42,6 +42,8 @@ final class GridEngine {
 	
 	/// The color currently selected for painting cells, if any.
 	var activePaintColor: Color? = nil
+	/// The object currently selected for filling cells, if any.
+	var activeObject: MurdokuObject? = nil
 	
 	/// The total time elapsed in seconds, excluding the current active timer session.
 	var elapsedTime: TimeInterval = 0
@@ -84,8 +86,8 @@ final class GridEngine {
 		case delete(package: MurdokuTransferPackage)
 		/// Changes the background color of a specific cell.
 		case changeColor(color: Color, row: Int, col: Int)
-		/// Selects a suspect for placement, or clears the selection if nil.
-		case selectSuspect(capitalLetter: String?)
+		/// Selects an object for placement.
+		case placeObject(object: MurdokuObject, row: Int, col: Int)
 		/// Toggles the candidate marker of a suspect at the given grid position.
 		case toggleSuspectCandidate(row: Int, col: Int)
 		/// Reverses the most recent recorded action, if any.
@@ -112,6 +114,8 @@ final class GridEngine {
 	func setupGameWith(rows: Int, columns: Int, suspectsNumber: Int, colors: Int) {
 		resetTimer()
 		self.selectedSuspect = nil
+		self.activePaintColor = nil
+		self.activeObject = nil
 		self.suspectCandidates = [:]
 		self.rows = rows
 		self.columns = columns
@@ -206,8 +210,10 @@ final class GridEngine {
 			self.draggingObject = nil
 		case .changeColor(let color, let row, let col):
 			setRoomColor(color, atRow: row, col: col)
-		case .selectSuspect(let capitalLetter):
-			selectedSuspect = capitalLetter
+		case .placeObject(let object, let row, let col):
+			if canPlaceObject(atRow: row, col: col, newObject: object) {
+				performMoveObject(object, toRow: row, col: col)
+			}
 		case .toggleSuspectCandidate(let row, let col):
 			guard let capitalLetter = selectedSuspect else { return }
 			toggleCandidate(atRow: row, col: col, capitalLetter: capitalLetter)
@@ -392,6 +398,13 @@ final class GridEngine {
 		return addedXMarks
 	}
 	
+	private func performMoveObject(_ object: MurdokuObject, toRow: Int, col: Int) {
+		guard toRow >= 0 && toRow < rows && col >= 0 && col < columns else { return }
+		guard object.element != .suspect && object.element != .victim else { return }
+		
+		cells[toRow][col].elements.append(object)
+	}
+	
 	/// Updates the placement status of a suspect based on their identifier.
 	///
 	/// - Parameter capitalLetter: The identifying letter of the suspect.
@@ -506,6 +519,8 @@ final class GridEngine {
 		self.cells = []
 		self.roomColors = []
 		self.selectedSuspect = nil
+		self.activePaintColor = nil
+		self.activeObject = nil
 		self.suspectCandidates = [:]
 		resetTimer()
 		self.savedGameID = nil

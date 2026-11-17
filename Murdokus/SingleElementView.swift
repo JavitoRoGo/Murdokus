@@ -28,6 +28,13 @@ struct SingleElementView: View {
 					Circle()
 						.fill(.ultraThickMaterial)
 				}
+				.overlay {
+					if engine.activeObject?.element == object.element {
+						Circle()
+							.stroke(.white, lineWidth: 3)
+							.shadow(radius: 2)
+					}
+				}
 				.onDrag {
 					guard canDrag else { return NSItemProvider() }
 					engine.draggingObject = object
@@ -51,9 +58,13 @@ struct SingleElementView: View {
         .opacity(canDrag ? 1.0 : 0.3)
         .scaleEffect(isSelected ? 1.1 : 1.0)
         .onTapGesture {
-            guard object.element == .suspect else { return }
-            guard object.isPlaced != true else { return }
-            engine.handleIntent(.selectSuspect(capitalLetter: object.capitalLetter ?? ""))
+			if object.element != .suspect {
+				engine.activeObject = object
+				engine.activePaintColor = nil
+			} else {
+				guard object.isPlaced != true else { return }
+				engine.selectedSuspect = object.capitalLetter ?? ""
+			}
         }
     }
 	

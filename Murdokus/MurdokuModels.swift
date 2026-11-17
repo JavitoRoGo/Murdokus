@@ -64,6 +64,12 @@ enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
 	
 	/// A tree that cannot support other elements stacked on top of it.
 	case tree = "Árbol"
+	
+	/// A gift that cannot support other elements stacked on top of it.
+	case gift = "Regalo"
+	
+	/// A box that cannot support other elements stacked on top of it.
+	case box = "Caja"
 
 	/// The identifier of the element, equal to its raw string value.
 	var id: Self { self }
@@ -96,6 +102,8 @@ enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
 		case .statue: Text("🗿")
 		case .rubble: Text("🛘")
 		case .tree: Text("🌳")
+		case .gift: Text("🎁")
+		case .box: Text("📦")
 		}
 	}
 

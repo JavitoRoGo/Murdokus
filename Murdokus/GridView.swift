@@ -38,7 +38,7 @@ struct GridView: View {
                                     ForEach(0..<engine.columns, id: \.self) { col in
                                         CellView(cell: engine.cells[row][col], row: row, col: col)
                                             .onTapGesture {
-                                                applyColorToCell(row: row, col: col)
+                                                applyColorOrElementToCell(row: row, col: col)
                                             }
                                     }
                                 }
@@ -74,15 +74,20 @@ struct GridView: View {
         return savedGamesStore.games.contains { $0.id == savedGameID }
     }
 
-    private func applyColorToCell(row: Int, col: Int) {
+    private func applyColorOrElementToCell(row: Int, col: Int) {
         if engine.selectedSuspect != nil {
             engine.handleIntent(.toggleSuspectCandidate(row: row, col: col))
             return
         }
 
-        guard let activeColor = engine.activePaintColor else { return }
-
-        engine.handleIntent(.changeColor(color: activeColor, row: row, col: col))
+		if let activeColor = engine.activePaintColor {
+			engine.handleIntent(.changeColor(color: activeColor, row: row, col: col))
+			return
+		}
+		
+		if let activeObject = engine.activeObject {
+			engine.handleIntent(.placeObject(object: activeObject, row: row, col: col))
+		}
     }
 
     private func saveTime() {

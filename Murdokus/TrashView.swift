@@ -26,9 +26,10 @@ struct TrashView: View {
 			.frame(width: 80, height: 80)
 			.onTapGesture {
 				engine.activePaintColor = nil
+				engine.activeObject = nil
 			}
             
-            Text("Arrastra aquí para borrar.\nToca para borrar la selección del color.")
+            Text("Arrastra aquí para borrar.\nToca para borrar la selección.")
                 .font(.caption)
                 .foregroundColor(.secondary)
 				.multilineTextAlignment(.center)

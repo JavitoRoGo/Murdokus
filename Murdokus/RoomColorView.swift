@@ -37,6 +37,7 @@ struct RoomColorView: View {
 		}
 		.onTapGesture {
 			engine.activePaintColor = roomColor
+			engine.activeObject = nil
 		}
 	}
 }
