@@ -74,14 +74,14 @@ enum MurdokuElement: String, CaseIterable, Identifiable, Codable {
 	/// The identifier of the element, equal to its raw string value.
 	var id: Self { self }
 
-	/// Returns the SF Symbols name for the receiver, optionally scoped to a suspect.
+	/// Returns a SwiftUI view that renders the receiver as an icon.
 	///
-	/// The returned symbol name is suitable for rendering the element as an
-	/// icon. When the receiver is a suspect, the given suspect identifier is
-	/// lowercased and combined with the circle symbol.
+	/// The returned view is assembled with a `ViewBuilder` and displays an SF Symbol
+	/// for the receiver, or for a suspect scoped by the given suspect identifier,
+	/// and an emoji-based text for the remaining element types.
 	///
-	/// - Parameter suspect: The identifier of the suspect used to build the symbol name.
-	/// - Returns: The SF Symbols name that represents the element.
+	/// - Parameter suspect: The identifier of the suspect used to build the icon for the suspect case.
+	/// - Returns: A SwiftUI view that represents the element as an icon.
 	@ViewBuilder
 	func icon(for suspect: String = "") -> some View {
 		switch self {
@@ -220,7 +220,7 @@ struct SavedGameSnapshot: Codable {
 	var rows: Int
 	/// The number of columns of the saved board.
 	var columns: Int
-	/// The number of spaces or colors of the saved game board.
+	/// The number of colors available for the saved game board.
 	var colors: Int = 0
 	/// The number of suspects of the saved board.
 	var suspectsNumber: Int

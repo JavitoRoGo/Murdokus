@@ -81,14 +81,36 @@ final class GridEngine {
 	/// Represents a user-driven action that modifies the game state.
 	enum UserIntent {
 		/// Moves an object to a specific grid coordinate.
+		///
+		/// - Parameters:
+		///   - package: The package containing the object and its origin.
+		///   - destinationRow: The destination row.
+		///   - destinationCol: The destination column.
 		case move(package: MurdokuTransferPackage, destinationRow: Int, destinationCol: Int)
 		/// Removes a specific object from the grid.
+		///
+		/// - Parameter package: The package containing the object to be removed and its origin.
 		case delete(package: MurdokuTransferPackage)
 		/// Changes the background color of a specific cell.
+		///
+		/// - Parameters:
+		///   - color: The color to apply.
+		///   - row: The row index of the cell.
+		///   - col: The column index of the cell.
 		case changeColor(color: Color, row: Int, col: Int)
-		/// Selects an object for placement.
+		/// Places an object into the grid at the specified position.
+		///
+		/// - Parameters:
+		///   - object: The object to place.
+		///   - row: The row of the destination cell.
+		///   - col: The column of the destination cell.
 		case placeObject(object: MurdokuObject, row: Int, col: Int)
 		/// Toggles the candidate marker of a suspect at the given grid position.
+		///
+		/// - Parameters:
+		///   - row: The row index of the grid position.
+		///   - col: The column index of the grid position.
+		///   - capitalLetter: The capital letter of the suspect.
 		case toggleSuspectCandidate(row: Int, col: Int)
 		/// Reverses the most recent recorded action, if any.
 		case undo
@@ -187,7 +209,7 @@ final class GridEngine {
 	/// Processes a user intent to update the game state.
 	///
 	/// - Parameter intent: The `UserIntent` to be handled.
-	/// - Note: Move actions are wrapped in a spring animation for smoother UI transitions.
+	/// - Note: Move and delete actions are wrapped in a spring animation for smoother UI transitions.
 	func handleIntent(_ intent: UserIntent) {
 		switch intent {
 		case .move(let package, let destRow, let destCol):
@@ -398,6 +420,12 @@ final class GridEngine {
 		return addedXMarks
 	}
 	
+	/// Moves a non-suspect and non-victim object into the grid at the specified cell.
+	///
+	/// - Parameters:
+	///   - object: The object to move into the grid.
+	///   - toRow: The destination row.
+	///   - col: The destination column.
 	private func performMoveObject(_ object: MurdokuObject, toRow: Int, col: Int) {
 		guard toRow >= 0 && toRow < rows && col >= 0 && col < columns else { return }
 		guard object.element != .suspect && object.element != .victim else { return }
