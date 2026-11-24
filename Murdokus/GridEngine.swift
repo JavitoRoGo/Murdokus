@@ -105,6 +105,8 @@ final class GridEngine {
 		///   - row: The row of the destination cell.
 		///   - col: The column of the destination cell.
 		case placeObject(object: MurdokuObject, row: Int, col: Int)
+		/// Selects a suspect for placement, or clears the selection if nil.
+		case selectSuspect(capitalLetter: String?)
 		/// Toggles the candidate marker of a suspect at the given grid position.
 		///
 		/// - Parameters:
@@ -215,6 +217,7 @@ final class GridEngine {
 		case .move(let package, let destRow, let destCol):
 			if package.object.element == .xMark {
 				performMoveObject(package.object, toRow: destRow, col: destCol)
+				clearCandidate(atRow: destRow, col: destCol)
 			}
 			if canPlaceObject(atRow: destRow, col: destCol, newObject: package.object) {
 				let addedXMarks = withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
@@ -239,6 +242,8 @@ final class GridEngine {
 			if canPlaceObject(atRow: row, col: col, newObject: object) {
 				performMoveObject(object, toRow: row, col: col)
 			}
+		case .selectSuspect(let capitalLetter):
+			selectedSuspect = capitalLetter
 		case .toggleSuspectCandidate(let row, let col):
 			guard let capitalLetter = selectedSuspect else { return }
 			toggleCandidate(atRow: row, col: col, capitalLetter: capitalLetter)
