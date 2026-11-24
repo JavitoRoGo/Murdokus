@@ -213,6 +213,9 @@ final class GridEngine {
 	func handleIntent(_ intent: UserIntent) {
 		switch intent {
 		case .move(let package, let destRow, let destCol):
+			if package.object.element == .xMark {
+				performMoveObject(package.object, toRow: destRow, col: destCol)
+			}
 			if canPlaceObject(atRow: destRow, col: destCol, newObject: package.object) {
 				let addedXMarks = withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
 					performMove(package: package, toRow: destRow, col: destCol)
