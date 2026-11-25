@@ -15,7 +15,7 @@ struct InstructionsStepView: View {
 	
 	var body: some View {
 		VStack(spacing: 20) {
-			Text("Instrucciones")
+			Text("Introduce aquí las reglas para los sospechosos")
 				.font(.title)
 				.multilineTextAlignment(.center)
 			
