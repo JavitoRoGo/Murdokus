@@ -32,6 +32,8 @@ final class GridEngine {
 	var roomColors: [Color] = []
 	/// Controls whether the suspect list is visible in the user interface.
 	var showingSuspects = false
+	/// The current stage of the setup flow presented in the central panel.
+	var setupStep: SetupStep = .colors
 	
 	/// A Boolean value indicating whether all suspects have been placed on the grid.
 	///
@@ -150,6 +152,7 @@ final class GridEngine {
 		self.solvedTime = nil
 		self.undoStack.removeAll()
 		self.showingSuspects = false
+		self.setupStep = .colors
 	}
 	
 	/// Builds a snapshot of the current board state, used for saving and restoring game sessions.
@@ -563,6 +566,7 @@ final class GridEngine {
 		self.isSolved = false
 		self.solvedTime = nil
 		self.undoStack.removeAll()
+		self.setupStep = .colors
 	}
 	
 	/// Loads a saved game snapshot into the engine, preparing a new game session.
