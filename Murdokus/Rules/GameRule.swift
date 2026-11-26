@@ -137,6 +137,17 @@ struct GameRule: Sendable, Equatable, Hashable, Codable {
 		self.comparison = comparison
 		self.relation = relation
 	}
+
+	/// Returns whether the rule is satisfied by the given assignment of persons to cells.
+	///
+	/// - Parameters:
+	///   - context: The board context used to resolve elements, zones and relations.
+	///   - assignment: The assignment of persons to cells, which may be partial.
+	/// - Returns: `true` when the rule holds for the assignment; while the involved persons
+	///   are not placed yet, the rule holds vacuously.
+	func isSatisfied(by context: BoardContext, assignment: [RulePerson: CellKey]) -> Bool {
+		RuleEvaluator.isSatisfied(self, context: context, assignment: assignment)
+	}
 }
 
 /// A general rule that is not scoped to a single person.
